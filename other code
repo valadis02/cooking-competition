@@ -1,0 +1,22 @@
+CREATE TABLE Chefs (
+    chef_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    national_cuisine VARCHAR(255),
+    experience_years INT,
+    specialization VARCHAR(255),
+    training_level ENUM('Garde Manger', 'Line Cook', 'Sous Chef', 'Chef'),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+INSERT INTO Chefs (user_id, national_cuisine, experience_years, specialization, training_level) VALUES
+    (2, 'Italian', 5, 'Italian Cuisine', 'Sous Chef'),
+    (3, 'French', 8, 'French Cuisine', 'Line Cook'),
+    (4, 'Japanese', 6, 'Japanese Cuisine', 'Garde Manger'),
+    (5, 'Mexican', 12, 'Mexican Cuisine', 'Chef'),
+    (1, 'Greek', 10, 'Greek Cuisine', 'Chef');
+
+INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES
+    (2, 'Italian', 1, 4.5),
+    (2, 'Italian', 2, 4.0),
+    (3, 'French', 3, 3.8);
+    
