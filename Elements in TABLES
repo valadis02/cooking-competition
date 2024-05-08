@@ -6,15 +6,15 @@ INSERT INTO Cuisines (name, description) VALUES
     ('Japanese', 'Japanese culinary delights'),
     ('Mexican', 'Spicy Mexican dishes');
 
--- Inserting into the MealTypes table
+-- Inserting into the Meal_Types table
 INSERT INTO MealTypes (name, description) VALUES
-    ('Breakfast', 'Morning meal'),
-    ('Lunch', 'Midday meal'),
-    ('Dinner', 'Evening meal'),
-    ('Snack', 'Small meal or bite'),
-    ('Dessert', 'Sweet course typically eaten at the end of a meal');
+    ('Breakfast'),
+    ('Lunch'),
+    ('Dinner'),
+    ('Snack'),
+    ('Dessert');
 
--- Inserting into the FoodGroups table
+-- Inserting into the Food_Groups table
 INSERT INTO FoodGroups (name, description) VALUES
     ('Vegetables', 'Edible parts of plants'),
     ('Fruits', 'Edible parts of plants that contain seeds'),
@@ -30,10 +30,10 @@ INSERT INTO Equipment (name, description) VALUES
     ('Knife', 'Tool with a sharp blade used for cutting'),
     ('Mixing Bowl', 'Bowl used for mixing ingredients');
 
--- Inserting into the Users table
-INSERT INTO Users (username, password, role) VALUES
-    ('admin', 'adminpassword', 'Administrator'),
-    ('chef1', 'chefpassword1', 'Chef'),
-    ('chef2', 'chefpassword2', 'Chef'),
-    ('chef3', 'chefpassword3', 'Chef'),
-    ('chef4', 'chefpassword4', 'Chef');
+INSERT INTO Users (username, password_hash, role, full_name, email, date_of_birth, age, contact_number, professional_experience_years, specialization, training_level) VALUES
+    ('admin', 'adminpasswordhash', 'Administrator', 'Admin User', 'admin@example.com', '1990-01-01', 34, '1234567890', 10, 'General Cooking', 'Chef'),
+    ('cook1', 'cookpasswordhash1', 'Cook', 'Cook One', 'cook1@example.com', '1995-05-15', 29, '9876543210', 5, 'Italian Cuisine', 'Sous Chef'),
+    ('cook2', 'cookpasswordhash2', 'Cook', 'Cook Two', 'cook2@example.com', '1988-09-20', 33, '5678901234', 8, 'French Cuisine', 'Line Cook'),
+    ('cook3', 'cookpasswordhash3', 'Cook', 'Cook Three', 'cook3@example.com', '1992-11-12', 29, '3456789012', 6, 'Japanese Cuisine', 'Garde Manger'),
+    ('cook4', 'cookpasswordhash4', 'Cook', 'Cook Four', 'cook4@example.com', '1985-03-25', 36, '2345678901', 12, 'Mexican Cuisine', 'Chef');
+
