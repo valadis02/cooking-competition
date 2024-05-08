@@ -1,0 +1,39 @@
+-- Inserting into the Cuisines table
+INSERT INTO Cuisines (name, description) VALUES
+    ('French', 'Traditional French cuisine'),
+    ('Italian', 'Classic Italian dishes'),
+    ('Greek', 'Authentic Greek recipes'),
+    ('Japanese', 'Japanese culinary delights'),
+    ('Mexican', 'Spicy Mexican dishes');
+
+-- Inserting into the MealTypes table
+INSERT INTO MealTypes (name, description) VALUES
+    ('Breakfast', 'Morning meal'),
+    ('Lunch', 'Midday meal'),
+    ('Dinner', 'Evening meal'),
+    ('Snack', 'Small meal or bite'),
+    ('Dessert', 'Sweet course typically eaten at the end of a meal');
+
+-- Inserting into the FoodGroups table
+INSERT INTO FoodGroups (name, description) VALUES
+    ('Vegetables', 'Edible parts of plants'),
+    ('Fruits', 'Edible parts of plants that contain seeds'),
+    ('Meats', 'Flesh of animals used as food'),
+    ('Dairy', 'Food produced from mammal milk'),
+    ('Grains', 'Edible seeds of cereal plants');
+
+-- Inserting into the Equipment table
+INSERT INTO Equipment (name, description) VALUES
+    ('Blender', 'Appliance used to mix, purée, or emulsify food and other substances'),
+    ('Oven', 'Enclosed compartment for heating, baking, or drying food'),
+    ('Saucepan', 'Deep cooking vessel with a handle and sometimes a lid'),
+    ('Knife', 'Tool with a sharp blade used for cutting'),
+    ('Mixing Bowl', 'Bowl used for mixing ingredients');
+
+-- Inserting into the Users table
+INSERT INTO Users (username, password, role) VALUES
+    ('admin', 'adminpassword', 'Administrator'),
+    ('chef1', 'chefpassword1', 'Chef'),
+    ('chef2', 'chefpassword2', 'Chef'),
+    ('chef3', 'chefpassword3', 'Chef'),
+    ('chef4', 'chefpassword4', 'Chef');
