@@ -1,0 +1,140 @@
+CREATE TABLE Cuisines (
+    cuisine_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT
+);
+
+CREATE TABLE Recipes (
+    recipe_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT,
+    cuisine_id INT,
+    difficulty_level INT,
+    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id)
+);
+
+CREATE TABLE Meal_Types (
+    meal_type_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE Recipe_Meal_Types (
+    recipe_id INT,
+    meal_type_id INT,
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
+    FOREIGN KEY (meal_type_id) REFERENCES Meal_Types(meal_type_id)
+);
+
+CREATE TABLE Recipe_Categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE Recipe_Category_Labels (
+    recipe_id INT,
+    category_id INT,
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
+    FOREIGN KEY (category_id) REFERENCES Recipe_Categories(category_id)
+);
+
+CREATE TABLE Recipe_Tags (
+    tag_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE Recipe_Tag_Labels (
+    recipe_id INT,
+    tag_id INT,
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
+    FOREIGN KEY (tag_id) REFERENCES Recipe_Tags(tag_id)
+);
+
+CREATE TABLE Recipe_Steps (
+    step_id INT AUTO_INCREMENT PRIMARY KEY,
+    recipe_id INT,
+    description TEXT,
+    order_number INT,
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id)
+);
+
+CREATE TABLE Ingredients (
+    ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
+    ingredient_name VARCHAR(255),
+    category VARCHAR(255),
+    description TEXT,
+    image_url VARCHAR(255)
+);
+
+CREATE TABLE Food_Groups (
+    group_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT
+);
+
+CREATE TABLE Recipe_Ingredients (
+    recipe_id INT,
+    ingredient_id INT,
+    quantity DECIMAL(10,2),
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
+    FOREIGN KEY (ingredient_id) REFERENCES Ingredients(ingredient_id)
+);
+
+CREATE TABLE Equipment (
+    equipment_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT,
+    usage_instructions TEXT
+);
+
+CREATE TABLE Recipe_Equipment (
+    recipe_id INT,
+    equipment_id INT,
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
+    FOREIGN KEY (equipment_id) REFERENCES Equipment(equipment_id)
+);
+
+CREATE TABLE Nutritional_Information (
+    info_id INT AUTO_INCREMENT PRIMARY KEY,
+    recipe_id INT,
+    fat_per_serving DECIMAL(10,2),
+    protein_per_serving DECIMAL(10,2),
+    carbs_per_serving DECIMAL(10,2),
+    calories_per_serving DECIMAL(10,2),
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id)
+);
+
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255),
+    password_hash VARCHAR(255),
+    role ENUM('Administrator', 'Cook'),
+    full_name VARCHAR(255),
+    email VARCHAR(255),
+    date_of_birth DATE,
+    age INT,
+    contact_number VARCHAR(20),
+    professional_experience_years INT,
+    specialization VARCHAR(255),
+    training_level ENUM('Garde Manger', 'Line Cook', 'Sous Chef', 'Chef')
+);
+
+CREATE TABLE Episodes (
+    episode_id INT AUTO_INCREMENT PRIMARY KEY,
+    number INT,
+    date DATE,
+    cuisine_id INT,
+    winning_recipe_id INT,
+    winning_cook_id INT,
+    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id),
+    FOREIGN KEY (winning_recipe_id) REFERENCES Recipes(recipe_id),
+    FOREIGN KEY (winning_cook_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Judges (
+    judge_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    expertise VARCHAR(255),
+    contact_number VARCHAR(20),
+    email VARCHAR(255)
+);
+
