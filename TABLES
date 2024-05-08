@@ -138,3 +138,12 @@ CREATE TABLE Judges (
     email VARCHAR(255)
 );
 
+CREATE TABLE Ratings (
+    rating_id INT AUTO_INCREMENT PRIMARY KEY,
+    chef_id INT,
+    national_cuisine VARCHAR(255),
+    user_id INT,
+    rating DECIMAL(3, 2),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
