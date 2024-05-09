@@ -1,7 +1,7 @@
 import random
 import mysql.connector
 
-# Σύνδεση στη βάση δεδομένων
+# Connect to the database
 db = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -9,18 +9,27 @@ db = mysql.connector.connect(
     database="db"
 )
 
-# Κατασκευή cursor για εκτέλεση εντολών SQL
+# Create a cursor to execute SQL queries
 cursor = db.cursor()
 
-# Ορισμός κλάσεων
+# Define classes
 
 class Chef:
-    def __init__(self, chef_id, age, expertise, cuisine):
+    def __init__(self, chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth):
         self.chef_id = chef_id
+        self.first_name = first_name
+        self.last_name = last_name
         self.age = age
+        self.years_of_experience = years_of_experience
         self.expertise = expertise
-        self.cuisine = cuisine
+        self.cuisine_id = cuisine_id
+        self.training_level = training_level
+        self.contact_number = contact_number
+        self.date_of_birth = date_of_birth
         self.rating = []
+
+
+
 
 class Judge:
     def __init__(self, judge_id):
@@ -31,77 +40,143 @@ class Cuisine:
         self.cuisine_id = cuisine_id
         self.name = name
 
-# Συνάρτηση για υπολογισμό βαθμολογίας
+# Function to calculate score
 def calculate_score(chef):
-    # Υπολογισμός μέσου όρου βαθμολογιών
     if chef.rating:
         avg_rating = sum(chef.rating) / len(chef.rating)
     else:
         avg_rating = 0
 
-    # Επιπλέον βαθμοί για επαγγελματική κατάρτιση
-    score = avg_rating + chef.expertise
-
+    score = avg_rating 
     return score
 
-# Δημιουργία λίστας με 10 τυχαίους μάγειρες
-chefs = []
-for i in range(10):
-    chef_id = i + 1
-    age = random.randint(20, 50)
-    expertise = random.randint(1, 3)
-    cuisine_id = i + 1  # Κάθε μάγειρας εκπροσωπεί την ίδια εθνική κουζίνα με το ID του
-    cuisine = Cuisine(cuisine_id, f"Cuisine {cuisine_id}")
-    chef = Chef(chef_id, age, expertise, cuisine)
-    chefs.append(chef)
+# Function to select a random recipe
+def select_random_recipe(cuisine_name):
+    return f"Recipe for {cuisine_name}"
 
-# Ορισμός 3 τυχαίων κριτών
-judges = [Judge(judge_id) for judge_id in range(1, 4)]
 
-# Συνάρτηση για επιλογή τυχαίων συνταγών
-def select_random_recipe(cuisine):
-    return f"Recipe for {cuisine.name}"
-
-# Κύριος κώδικας για τον διαγωνισμό
-
-# Για κάθε επεισόδιο
-for episode in range(2):
-    print(f"Episode {episode + 1}:")
-
-    # Εκτέλεση συνταγής από κάθε μάγειρα
-    for chef in chefs:
-        recipe = select_random_recipe(chef.cuisine)
-        print(f"Chef {chef.chef_id} executes recipe '{recipe}' for cuisine '{chef.cuisine.name}'")
-
-        # Αξιολόγηση από τους κριτές
-        chef.rating = [random.randint(1, 5) for _ in range(3)]
-        print(f"Ratings for Chef {chef.chef_id}: {chef.rating}")
-
-    # Υπολογισμός συνολικών βαθμών και εύρεση νικητή
-    winner = max(chefs, key=calculate_score)
-    print(f"Winner of Episode {episode + 1}: Chef {winner.chef_id}\n")
-
-    # Ενημέρωση του πίνακα "winners" με τον νικητή του διαγωνισμού
+# Function to update the winners table
 def update_winners_table(winner_id, episode):
     sql = "INSERT INTO winners (chef_id, episode) VALUES (%s, %s)"
     val = (winner_id, episode)
     cursor.execute(sql, val)
     db.commit()
 
-# Κύριος κώδικας για τον διαγωνισμό
+# Main code for the competition
 
-# Για κάθε επεισόδιο
-for episode in range(2):
+# Execute query to select all chefs from the database
+cursor.execute("SELECT * FROM chefs")
+rows = cursor.fetchall()
+
+# List to store Chef objects
+chefs = []
+
+# Create Chef objects from the retrieved data
+for row in rows:
+    chef_id, first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level = row
+    chef = Chef(chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth)
+    chefs.append(chef)
+
+
+
+
+# Define 3 random judges
+judges = [Judge(judge_id) for judge_id in range(1, 4)]
+
+# For each episode
+for episode in range(10):
     print(f"Episode {episode + 1}:")
 
-    # Υπολογισμός συνολικών βαθμών και εύρεση νικητή
-    winner = max(chefs, key=calculate_score)
-    print(f"Winner of Episode {episode + 1}: Chef {winner.chef_id}\n")
+    # Execute recipe for each chef
+    for chef in chefs:
+        # Fetch the name of the cuisine from the Cuisines table
+        cursor.execute("SELECT name FROM Cuisines WHERE cuisine_id = %s", (chef.cuisine_id,))
+        cuisine_name = cursor.fetchone()[0]
 
-    # Ενημέρωση του πίνακα "winners" στη βάση δεδομένων
+        # Generate a random recipe for the cuisine
+        recipe = select_random_recipe(cuisine_name)
+
+        # Print the chef's name and the generated recipe
+        print(f"{chef.first_name} executes recipe '{recipe}' for cuisine '{cuisine_name}'")
+
+        # Judge the recipe
+        chef.rating = [random.randint(1, 5) for _ in range(3)]
+        print(f"Ratings for {chef.first_name}: {chef.rating}")
+
+    # Calculate total scores and find the winner
+    winner = max(chefs, key=calculate_score)
+    print(f"Winner of Episode {episode + 1}: {winner.first_name} {winner.last_name} (Chef {winner.chef_id})\n")
+
+    # Add the winner to the winners table
     update_winners_table(winner.chef_id, episode + 1)
 
-# Κλείσιμο cursor και σύνδεσης με τη βάση δεδομένων
+# List to store chefs who have never been judges
+chefs_not_judges = []
+
+# Check if a chef has ever been a judge
+def check_if_judge(chef_id):
+    sql = "SELECT COUNT(*) FROM winners WHERE chef_id = %s"
+    val = (chef_id,)
+    cursor.execute(sql, val)
+    result = cursor.fetchone()
+    return result[0] > 0
+
+# Populate chefs_not_judges list and insert into the table
+for chef in chefs:
+    if not check_if_judge(chef.chef_id):
+        # Check if the chef ID already exists in the chefs_not_judges table
+        cursor.execute("SELECT COUNT(*) FROM chefs_not_judges WHERE chef_id = %s", (chef.chef_id,))
+        count = cursor.fetchone()[0]
+        if count == 0:  # Chef ID does not exist in chefs_not_judges table
+            chefs_not_judges.append(chef)
+            # Insert chef into chefs_not_judges table
+            insert_sql = "INSERT INTO chefs_not_judges (chef_id, first_name, last_name, age, expertise, cuisine_id, contact_number, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            insert_val = (chef.chef_id, chef.first_name, chef.last_name, chef.age, chef.expertise, chef.cuisine_id, chef.contact_number, chef.date_of_birth)
+            cursor.execute(insert_sql, insert_val)
+            db.commit()
+
+
+# Print the chefs who have never been judges
+print("Chefs who have never been judges:")
+for chef in chefs_not_judges:
+    print(f"- {chef.first_name} {chef.last_name}")
+
+def calculate_total_training_level(episode):
+    sql_query = """
+        SELECT SUM(training_level) 
+        FROM (
+            SELECT training_level 
+            FROM chefs 
+            WHERE chef_id IN (SELECT chef_id FROM winners WHERE episode = %s)
+            UNION ALL
+            SELECT 0 
+            FROM judges
+        ) AS total_training
+    """
+    cursor.execute(sql_query, (episode,))
+    result = cursor.fetchone()
+    return result[0] if result[0] is not None else 0
+
+
+# Define the number of episodes
+num_episodes = 10
+
+# Calculate the total training level for each episode
+episode_training_levels = {}
+for episode in range(1, num_episodes + 1):
+    episode_training_levels[episode] = calculate_total_training_level(episode)
+
+# Find the episode with the lowest total training level
+min_training_level_episode = min(episode_training_levels, key=episode_training_levels.get)
+
+# Print the results
+print("Total Training Levels for Each Episode:")
+for episode, training_level in episode_training_levels.items():
+    print(f"Episode {episode}: {training_level}")
+
+print(f"\nEpisode with the Lowest Total Training Level: {min_training_level_episode} (Total Training Level: {episode_training_levels[min_training_level_episode]})")
+
+
+# Close cursor and database connection
 cursor.close()
 db.close()
-
