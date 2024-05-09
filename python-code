@@ -1,1 +1,107 @@
+import random
+import mysql.connector
+
+# Σύνδεση στη βάση δεδομένων
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="12345",
+    database="db"
+)
+
+# Κατασκευή cursor για εκτέλεση εντολών SQL
+cursor = db.cursor()
+
+# Ορισμός κλάσεων
+
+class Chef:
+    def __init__(self, chef_id, age, expertise, cuisine):
+        self.chef_id = chef_id
+        self.age = age
+        self.expertise = expertise
+        self.cuisine = cuisine
+        self.rating = []
+
+class Judge:
+    def __init__(self, judge_id):
+        self.judge_id = judge_id
+
+class Cuisine:
+    def __init__(self, cuisine_id, name):
+        self.cuisine_id = cuisine_id
+        self.name = name
+
+# Συνάρτηση για υπολογισμό βαθμολογίας
+def calculate_score(chef):
+    # Υπολογισμός μέσου όρου βαθμολογιών
+    if chef.rating:
+        avg_rating = sum(chef.rating) / len(chef.rating)
+    else:
+        avg_rating = 0
+
+    # Επιπλέον βαθμοί για επαγγελματική κατάρτιση
+    score = avg_rating + chef.expertise
+
+    return score
+
+# Δημιουργία λίστας με 10 τυχαίους μάγειρες
+chefs = []
+for i in range(10):
+    chef_id = i + 1
+    age = random.randint(20, 50)
+    expertise = random.randint(1, 3)
+    cuisine_id = i + 1  # Κάθε μάγειρας εκπροσωπεί την ίδια εθνική κουζίνα με το ID του
+    cuisine = Cuisine(cuisine_id, f"Cuisine {cuisine_id}")
+    chef = Chef(chef_id, age, expertise, cuisine)
+    chefs.append(chef)
+
+# Ορισμός 3 τυχαίων κριτών
+judges = [Judge(judge_id) for judge_id in range(1, 4)]
+
+# Συνάρτηση για επιλογή τυχαίων συνταγών
+def select_random_recipe(cuisine):
+    return f"Recipe for {cuisine.name}"
+
+# Κύριος κώδικας για τον διαγωνισμό
+
+# Για κάθε επεισόδιο
+for episode in range(2):
+    print(f"Episode {episode + 1}:")
+
+    # Εκτέλεση συνταγής από κάθε μάγειρα
+    for chef in chefs:
+        recipe = select_random_recipe(chef.cuisine)
+        print(f"Chef {chef.chef_id} executes recipe '{recipe}' for cuisine '{chef.cuisine.name}'")
+
+        # Αξιολόγηση από τους κριτές
+        chef.rating = [random.randint(1, 5) for _ in range(3)]
+        print(f"Ratings for Chef {chef.chef_id}: {chef.rating}")
+
+    # Υπολογισμός συνολικών βαθμών και εύρεση νικητή
+    winner = max(chefs, key=calculate_score)
+    print(f"Winner of Episode {episode + 1}: Chef {winner.chef_id}\n")
+
+    # Ενημέρωση του πίνακα "winners" με τον νικητή του διαγωνισμού
+def update_winners_table(winner_id, episode):
+    sql = "INSERT INTO winners (chef_id, episode) VALUES (%s, %s)"
+    val = (winner_id, episode)
+    cursor.execute(sql, val)
+    db.commit()
+
+# Κύριος κώδικας για τον διαγωνισμό
+
+# Για κάθε επεισόδιο
+for episode in range(2):
+    print(f"Episode {episode + 1}:")
+
+    # Υπολογισμός συνολικών βαθμών και εύρεση νικητή
+    winner = max(chefs, key=calculate_score)
+    print(f"Winner of Episode {episode + 1}: Chef {winner.chef_id}\n")
+
+    # Ενημέρωση του πίνακα "winners" στη βάση δεδομένων
+    update_winners_table(winner.chef_id, episode + 1)
+
+# Κλείσιμο cursor και σύνδεσης με τη βάση δεδομένων
+cursor.close()
+db.close()
 
