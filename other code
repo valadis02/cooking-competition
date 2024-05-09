@@ -18,3 +18,20 @@ INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES
     (2, 'Italian', 2, 4.0),
     (3, 'French', 3, 3.8);
     
+-- Insert 15 more cuisines into the Cuisines table with shorter descriptions
+INSERT INTO Cuisines (cuisine_id,name, description) VALUES
+(6, 'Indian', 'Spicy, flavorful dishes'),
+(7, 'Tinisian', 'Mediterranean delights'),
+(8, 'Thai', 'Sweet, sour, spicy'),
+(9, 'Spanish', 'Rich, bold flavors'),
+(10, 'Mediterranean', 'Fresh, light cuisine'),
+(11, 'Korean', 'Savory, spicy dishes'),
+(12, 'Vietnamese', 'Fresh, aromatic cuisine'),
+(13, 'Brazilian', 'Grilled meats, feijoada'),
+(14, 'Turkish', 'Rich, diverse flavors'),
+(15, 'Lebanese', 'Aromatic, bold spices'),
+(16, 'Moroccan', 'Exotic, fragrant dishes'),
+(17, 'Russian', 'Hearty, comforting food'),
+(18, 'Peruvian', 'Fusion of flavors'),
+(19, 'Swedish', 'Simple, fresh cuisine'),
+(20, 'African', 'Diverse, bold flavors');
