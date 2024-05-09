@@ -35,3 +35,27 @@ INSERT INTO Cuisines (cuisine_id,name, description) VALUES
 (18, 'Peruvian', 'Fusion of flavors'),
 (19, 'Swedish', 'Simple, fresh cuisine'),
 (20, 'African', 'Diverse, bold flavors');
+
+-- Insert 20 chefs into the chefs table, naming them after the cuisines
+INSERT INTO chefs (chef_id, age, expertise, cuisine_id, name) VALUES
+(1, 30, 2, 1, 'French'),
+(2, 35, 3, 2, 'Italian'),
+(3, 28, 1, 3, 'Greek'),
+(4, 40, 2, 4, 'Japanese'),
+(5, 25, 3, 5, 'Mexican'),
+(6, 32, 2, 6, 'Indian'),
+(7, 37, 1, 7, 'Tinisian'),
+(8, 29, 3, 8, 'Thai'),
+(9, 33, 1, 9, 'Spanish'),
+(10, 38, 2, 10, 'Mediterranean'),
+(11, 27, 3, 11, 'Korean'),
+(12, 31, 1, 12, 'Vietnamese'),
+(13, 36, 2, 13, 'Brazilian'),
+(14, 26, 1, 14, 'Turkish'),
+(15, 34, 3, 15, 'Lebanese'),
+(16, 39, 2, 16, 'Moroccan'),
+(17, 24, 1, 17, 'Russian'),
+(18, 41, 3, 18, 'Peruvian'),
+(19, 23, 2, 19, 'Swedish'),
+(20, 42, 1, 20, 'African');
+
