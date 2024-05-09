@@ -1,11 +1,9 @@
-CREATE TABLE Chefs (
+CREATE TABLE chefs (
     chef_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    national_cuisine VARCHAR(255),
-    experience_years INT,
-    specialization VARCHAR(255),
-    training_level ENUM('Garde Manger', 'Line Cook', 'Sous Chef', 'Chef'),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+    age INT,
+    expertise INT,
+    cuisine_id INT,
+    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id)
 );
 
 INSERT INTO Chefs (user_id, national_cuisine, experience_years, specialization, training_level) VALUES
