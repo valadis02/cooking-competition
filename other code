@@ -59,3 +59,11 @@ INSERT INTO chefs (chef_id, age, expertise, cuisine_id, name) VALUES
 (19, 23, 2, 19, 'Swedish'),
 (20, 42, 1, 20, 'African');
 
+CREATE TABLE IF NOT EXISTS chefs_not_judges (
+        chef_id INT PRIMARY KEY,
+        name VARCHAR(255),
+        age INT,
+        expertise INT,
+        cuisine_id INT,
+        FOREIGN KEY (cuisine_id) REFERENCES cuisines(cuisine_id)
+    )
