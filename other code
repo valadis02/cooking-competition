@@ -23,6 +23,8 @@ INSERT INTO Chefs (user_id, national_cuisine, experience_years, specialization, 
     (1, 'Greek', 10, 'Greek Cuisine', 'Chef');
 
 INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES
+
+
     (2, 'Italian', 1, 4.5),
     (2, 'Italian', 2, 4.0),
     (3, 'French', 3, 3.8);
@@ -83,3 +85,12 @@ CREATE TABLE low_training_episode (
     episode INT PRIMARY KEY,
     training_level INT
 );
+
+CREATE TABLE top_rated_judges (
+        judge_id INT AUTO_INCREMENT PRIMARY KEY,
+        judge_first_name VARCHAR(255),
+        judge_last_name VARCHAR(255),
+        chef_first_name VARCHAR(255),
+        chef_last_name VARCHAR(255),
+        total_rating FLOAT
+    )
