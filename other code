@@ -79,3 +79,7 @@ CREATE TABLE chefs_not_judges (
     date_of_birth DATE
 );
 
+CREATE TABLE low_training_episode (
+    episode INT PRIMARY KEY,
+    training_level INT
+);
