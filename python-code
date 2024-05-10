@@ -176,6 +176,19 @@ for episode, training_level in episode_training_levels.items():
 
 print(f"\nEpisode with the Lowest Total Training Level: {min_training_level_episode} (Total Training Level: {episode_training_levels[min_training_level_episode]})")
 
+# Find the episode with the lowest total training level
+min_training_level_episode = min(episode_training_levels, key=episode_training_levels.get)
+min_training_level = episode_training_levels[min_training_level_episode]
+
+# SQL query to insert the lowest training episode into the table
+sql = "INSERT INTO low_training_episode (episode, training_level) VALUES (%s, %s)"
+val = (min_training_level_episode, min_training_level)
+cursor.execute(sql, val)
+db.commit()
+
+# Print the results (no need to print twice i just show how it would have been done in mysql)
+# print(f"\nEpisode with the Lowest Total Training Level: {min_training_level_episode} (Total Training Level: {min_training_level})")
+
 
 # Close cursor and database connection
 cursor.close()
