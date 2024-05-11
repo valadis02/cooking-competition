@@ -1,0 +1,12 @@
+CREATE TABLE popular_judges (
+    judge_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    contact_number VARCHAR(20),
+    date_of_birth DATE,
+    age INT,
+    years_of_experience INT,
+    expertise VARCHAR(255),
+    cuisine_id INT,
+    training_level INT
+);
