@@ -1,0 +1,11 @@
+CREATE TABLE cooks_belong_to_cuisine (
+    chef_id INT,
+    national_cuisine VARCHAR(255),
+    FOREIGN KEY (chef_id) REFERENCES chefs(chef_id)
+);
+
+-- Insert chefs belonging to each cuisine
+INSERT INTO cooks_belong_to_cuisine (chef_id, national_cuisine)
+SELECT c.chef_id, cu.name AS national_cuisine
+FROM chefs c
+JOIN Cuisines cu ON c.cuisine_id = cu.cuisine_id;
