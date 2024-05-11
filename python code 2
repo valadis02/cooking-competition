@@ -65,69 +65,82 @@ def update_winners_table(winner_id, episode):
     cursor.execute(sql, val)
     db.commit()
 
+
 # Main code for the competition
-
-# Execute query to select all chefs from the database
-cursor.execute("SELECT * FROM chefs")
-rows = cursor.fetchall()
-
-# List to store Chef objects
-chefs = []
-
-# Create Chef objects from the retrieved data
-for row in rows:
-    chef_id, first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level = row
-    chef = Chef(chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth)
-    chefs.append(chef)
-
-# For each episode
 for episode in range(10):
-       print(f"Episode {episode + 1}:")
+    print(f"Episode {episode + 1}:")
 
-       # Shuffle the list of chefs for random selection
-       random.shuffle(chefs)
+    # Fetch all chefs from the database
+    cursor.execute("SELECT * FROM chefs")
+    rows = cursor.fetchall()
 
-       # Randomly select 10 chefs for this episode
-       selected_chefs = random.sample(chefs, 10)
+    # List to store Chef objects
+    chefs = []
 
-       # Randomly select 3 judges from chefs
-       judges = random.sample(chefs, 3)
+    # Create Chef objects from the retrieved data
+    for row in rows:
+        chef_id, first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level = row
+        chef = Chef(chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth)
+        chefs.append(chef)
 
-       # Insert judges into the judges table
-       for judge in judges:
+    # Shuffle the list of chefs for random selection
+    random.shuffle(chefs)
+
+    # Randomly select 10 chefs for this episode
+    selected_chefs = random.sample(chefs, 10)
+
+    # Remove selected chefs from the list to ensure judges are selected from the remaining chefs
+    for chef in selected_chefs:
+        chefs.remove(chef)
+
+    # List to store judges for this episode
+    episode_judges = []
+
+    # Randomly select 3 judges from the remaining chefs for this episode
+    episode_judges.extend(random.sample(chefs, min(3, len(chefs))))
+
+    # Insert judges into the judges table for this episode
+    for judge in episode_judges:
         cursor.execute("INSERT INTO judges (first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                        (judge.first_name, judge.last_name, judge.contact_number, judge.date_of_birth, judge.age, judge.years_of_experience, judge.expertise, judge.cuisine_id, judge.training_level))
         db.commit()
 
-for episode in range(10):
+    # Clear ratings for all chefs before each episode
+    for chef in chefs:
+        chef.rating = []
+
     # Execute recipe for each chef
     for chef in selected_chefs:
-    # Fetch the name of the cuisine from the Cuisines table
-       cursor.execute("SELECT name FROM Cuisines WHERE cuisine_id = %s", (chef.cuisine_id,))
-       cuisine_name = cursor.fetchone()[0]
+        # Fetch the name of the cuisine from the Cuisines table
+        cursor.execute("SELECT name FROM Cuisines WHERE cuisine_id = %s", (chef.cuisine_id,))
+        cuisine_name = cursor.fetchone()[0]
 
-    # Generate a random recipe for the cuisine
-       recipe = select_random_recipe(cuisine_name)
+        # Generate a random recipe for the cuisine
+        recipe = select_random_recipe(cuisine_name)
 
-    # Print the chef's name and the generated recipe
-       print(f"{chef.first_name} executes recipe '{recipe}' for cuisine '{cuisine_name}'")
+        # Print the chef's name and the generated recipe
+        print(f"{chef.first_name} executes recipe '{recipe}' for cuisine '{cuisine_name}'")
 
-    # Judge the recipe
-       ratings = [random.randint(1, 5) for _ in range(3)]  # Generates 3 random ratings
-       print(f"Ratings for {chef.first_name}: {ratings}")
+        # Judge the recipe
+        ratings = [random.randint(1, 5) for _ in range(len(episode_judges))]  # Generates ratings for each judge
+        print(f"Ratings for {chef.first_name}: {ratings}")
 
-     # Insert ratings into the Ratings table
-       for rating in ratings:
-        insert_rating(chef.chef_id, cuisine_name, judge.chef_id, rating)
+        # Insert ratings into the Ratings table
+        for rating, judge in zip(ratings, episode_judges):
+            insert_rating(chef.chef_id, cuisine_name, judge.chef_id, rating)
+            # Append rating to chef's rating list
+            chef.rating.append(rating)
 
-    # Calculate total scores and find the winner
-       winner = max(chefs, key=calculate_score)
-       print(f"Winner of Episode {episode + 1}: {winner.first_name} {winner.last_name} (Chef {winner.chef_id})\n")
+    # Calculate total scores for this episode and find the winner
+    winner = max(selected_chefs, key=calculate_score)
+    print(f"Winner of Episode {episode + 1}: {winner.first_name} {winner.last_name} (Chef {winner.chef_id})\n")
 
     # Add the winner to the winners table
-       update_winners_table(winner.chef_id, episode + 1)
+    update_winners_table(winner.chef_id, episode + 1)
 
 
+
+'''
 # List to store chefs who have never been judges
 chefs_not_judges = []
 
@@ -158,6 +171,7 @@ for chef in chefs:
 print("Chefs who have never been judges:")
 for chef in chefs_not_judges:
     print(f"- {chef.first_name} {chef.last_name}")
+    '''
 
 def calculate_total_training_level(episode):
     sql_query = """
@@ -252,4 +266,3 @@ for judge_data in top_rated_judges:
 # Close cursor and database connection
 cursor.close()
 db.close()
-
