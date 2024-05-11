@@ -1,0 +1,15 @@
+-- Create the young_chefs table if it doesn't exist
+CREATE TABLE IF NOT EXISTS young_chefs LIKE chefs;
+
+-- Create a trigger to automatically insert new young chefs
+DELIMITER //
+CREATE TRIGGER insert_young_chef
+AFTER INSERT ON chefs
+FOR EACH ROW
+BEGIN
+    IF NEW.age < 30 THEN
+        INSERT INTO young_chefs VALUES (NEW.chef_id, NEW.first_name, NEW.last_name, NEW.contact_number, NEW.date_of_birth, NEW.age, NEW.years_of_experience, NEW.expertise, NEW.cuisine_id, NEW.training_level);
+    END IF;
+END;
+//
+DELIMITER ;
