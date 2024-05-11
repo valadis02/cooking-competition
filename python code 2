@@ -1,1 +1,255 @@
+import random
+import mysql.connector
+
+# Connect to the database
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="12345",
+    database="db"
+)
+
+# Create a cursor to execute SQL queries
+cursor = db.cursor()
+
+# Define classes
+
+class Chef:
+    def __init__(self, chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth):
+        self.chef_id = chef_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age
+        self.years_of_experience = years_of_experience
+        self.expertise = expertise
+        self.cuisine_id = cuisine_id
+        self.training_level = training_level
+        self.contact_number = contact_number
+        self.date_of_birth = date_of_birth
+        self.rating = []
+
+class Judge:
+    def __init__(self, chef_id):
+        self.chef_id = chef_id
+
+class Cuisine:
+    def __init__(self, cuisine_id, name):
+        self.cuisine_id = cuisine_id
+        self.name = name
+
+# Function to calculate score
+def calculate_score(chef):
+    if chef.rating:
+        avg_rating = sum(chef.rating) / len(chef.rating)
+    else:
+        avg_rating = 0
+
+    score = avg_rating 
+    return score
+
+def insert_rating(chef_id, national_cuisine, user_id, rating):
+    sql = "INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES (%s, %s, %s, %s)"
+    val = (chef_id, national_cuisine, user_id, rating)
+    cursor.execute(sql, val)
+    db.commit()
+    
+
+# Function to select a random recipe
+def select_random_recipe(cuisine_name):
+    return f"Recipe for {cuisine_name}"
+
+# Function to update the winners table
+def update_winners_table(winner_id, episode):
+    sql = "INSERT INTO winners (chef_id, episode) VALUES (%s, %s)"
+    val = (winner_id, episode)
+    cursor.execute(sql, val)
+    db.commit()
+
+# Main code for the competition
+
+# Execute query to select all chefs from the database
+cursor.execute("SELECT * FROM chefs")
+rows = cursor.fetchall()
+
+# List to store Chef objects
+chefs = []
+
+# Create Chef objects from the retrieved data
+for row in rows:
+    chef_id, first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level = row
+    chef = Chef(chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth)
+    chefs.append(chef)
+
+# For each episode
+for episode in range(10):
+       print(f"Episode {episode + 1}:")
+
+       # Shuffle the list of chefs for random selection
+       random.shuffle(chefs)
+
+       # Randomly select 10 chefs for this episode
+       selected_chefs = random.sample(chefs, 10)
+
+       # Randomly select 3 judges from chefs
+       judges = random.sample(chefs, 3)
+
+       # Insert judges into the judges table
+       for judge in judges:
+        cursor.execute("INSERT INTO judges (first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                       (judge.first_name, judge.last_name, judge.contact_number, judge.date_of_birth, judge.age, judge.years_of_experience, judge.expertise, judge.cuisine_id, judge.training_level))
+        db.commit()
+
+for episode in range(10):
+    # Execute recipe for each chef
+    for chef in selected_chefs:
+    # Fetch the name of the cuisine from the Cuisines table
+       cursor.execute("SELECT name FROM Cuisines WHERE cuisine_id = %s", (chef.cuisine_id,))
+       cuisine_name = cursor.fetchone()[0]
+
+    # Generate a random recipe for the cuisine
+       recipe = select_random_recipe(cuisine_name)
+
+    # Print the chef's name and the generated recipe
+       print(f"{chef.first_name} executes recipe '{recipe}' for cuisine '{cuisine_name}'")
+
+    # Judge the recipe
+       ratings = [random.randint(1, 5) for _ in range(3)]  # Generates 3 random ratings
+       print(f"Ratings for {chef.first_name}: {ratings}")
+
+     # Insert ratings into the Ratings table
+       for rating in ratings:
+        insert_rating(chef.chef_id, cuisine_name, judge.chef_id, rating)
+
+    # Calculate total scores and find the winner
+       winner = max(chefs, key=calculate_score)
+       print(f"Winner of Episode {episode + 1}: {winner.first_name} {winner.last_name} (Chef {winner.chef_id})\n")
+
+    # Add the winner to the winners table
+       update_winners_table(winner.chef_id, episode + 1)
+
+
+# List to store chefs who have never been judges
+chefs_not_judges = []
+
+# Check if a chef has ever been a judge
+def check_if_judge(chef_id):
+    sql = "SELECT COUNT(*) FROM winners WHERE chef_id = %s"
+    val = (chef_id,)
+    cursor.execute(sql, val)
+    result = cursor.fetchone()
+    return result[0] > 0
+
+# Populate chefs_not_judges list and insert into the table
+for chef in chefs:
+    if not check_if_judge(chef.chef_id):
+        # Check if the chef ID already exists in the chefs_not_judges table
+        cursor.execute("SELECT COUNT(*) FROM chefs_not_judges WHERE chef_id = %s", (chef.chef_id,))
+        count = cursor.fetchone()[0]
+        if count == 0:  # Chef ID does not exist in chefs_not_judges table
+            chefs_not_judges.append(chef)
+            # Insert chef into chefs_not_judges table
+            insert_sql = "INSERT INTO chefs_not_judges (chef_id, first_name, last_name, age, expertise, cuisine_id, contact_number, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            insert_val = (chef.chef_id, chef.first_name, chef.last_name, chef.age, chef.expertise, chef.cuisine_id, chef.contact_number, chef.date_of_birth)
+            cursor.execute(insert_sql, insert_val)
+            db.commit()
+
+
+# Print the chefs who have never been judges
+print("Chefs who have never been judges:")
+for chef in chefs_not_judges:
+    print(f"- {chef.first_name} {chef.last_name}")
+
+def calculate_total_training_level(episode):
+    sql_query = """
+        SELECT SUM(training_level) 
+        FROM (
+            SELECT training_level 
+            FROM chefs 
+            WHERE chef_id IN (SELECT chef_id FROM winners WHERE episode = %s)
+            UNION ALL
+            SELECT 0 
+            FROM judges
+        ) AS total_training
+    """
+    cursor.execute(sql_query, (episode,))
+    result = cursor.fetchone()
+    return result[0] if result[0] is not None else 0
+
+
+# Define the number of episodes
+num_episodes = 10
+
+# Calculate the total training level for each episode
+episode_training_levels = {}
+for episode in range(1, num_episodes + 1):
+    episode_training_levels[episode] = calculate_total_training_level(episode)
+
+# Find the episode with the lowest total training level
+min_training_level_episode = min(episode_training_levels, key=episode_training_levels.get)
+min_training_level = episode_training_levels[min_training_level_episode]
+
+# Print the results
+print("Total Training Levels for Each Episode:")
+for episode, training_level in episode_training_levels.items():
+    print(f"Episode {episode}: {training_level}")
+
+print(f"\nEpisode with the Lowest Total Training Level: {min_training_level_episode} (Total Training Level: {episode_training_levels[min_training_level_episode]})")
+
+# Find the episode with the lowest total training level
+min_training_level_episode = min(episode_training_levels, key=episode_training_levels.get)
+min_training_level = episode_training_levels[min_training_level_episode]
+
+# SQL query to insert or update the lowest training episode into the table
+sql = "INSERT INTO low_training_episode (episode, training_level) VALUES (%s, %s) ON DUPLICATE KEY UPDATE training_level = VALUES(training_level)"
+val = (min_training_level_episode, min_training_level)
+cursor.execute(sql, val)
+db.commit()
+
+
+# Print the results (no need to print twice i just show how it would have been done in mysql)
+# print(f"\nEpisode with the Lowest Total Training Level: {min_training_level_episode} (Total Training Level: {min_training_level})")
+
+# SQL query to calculate total ratings given by each judge to each chef
+sql_query = """
+    SELECT j.judge_id, j.first_name AS judge_first_name, j.last_name AS judge_last_name, c.first_name AS chef_first_name, c.last_name AS chef_last_name, SUM(r.rating) AS total_rating
+    FROM judges j
+    JOIN ratings r ON j.judge_id = r.chef_id
+    JOIN chefs c ON r.chef_id = c.chef_id
+    GROUP BY j.judge_id
+    ORDER BY total_rating DESC
+    LIMIT 5;
+
+"""
+
+# Execute the SQL query
+cursor.execute(sql_query)
+rows = cursor.fetchall()
+
+print(" ")
+print("The judges who gave the best ratings are the following:")
+print(rows)
+
+# Select top 5 judges
+top_rated_judges = rows[:5]
+
+# Insert top-rated judges into the top_rated_judges table
+# Insert top-rated judges into the top_rated_judges table
+for judge_data in top_rated_judges:
+    judge_id, judge_first_name, judge_last_name, chef_first_name, chef_last_name, total_rating = judge_data
+    # Check if the judge with the same ID already exists in the table
+    cursor.execute("SELECT COUNT(*) FROM top_rated_judges WHERE judge_id = %s", (judge_id,))
+    count = cursor.fetchone()[0]
+    if count == 0:  # Judge with the same ID doesn't exist, insert new entry
+        cursor.execute("INSERT INTO top_rated_judges (judge_id, judge_first_name, judge_last_name, chef_first_name, chef_last_name, total_rating) VALUES (%s, %s, %s, %s, %s, %s)",
+                       (judge_id, judge_first_name, judge_last_name, chef_first_name, chef_last_name, total_rating))
+    else:  # Judge with the same ID exists, update their information
+        cursor.execute("UPDATE top_rated_judges SET judge_first_name = %s, judge_last_name = %s, chef_first_name = %s, chef_last_name = %s, total_rating = %s WHERE judge_id = %s",
+                       (judge_first_name, judge_last_name, chef_first_name, chef_last_name, total_rating, judge_id))
+    db.commit()
+
+
+
+# Close cursor and database connection
+cursor.close()
+db.close()
 
