@@ -10,3 +10,52 @@ CREATE TABLE popular_judges (
     cuisine_id INT,
     training_level INT
 );
+
+DELIMITER //
+
+CREATE TRIGGER update_popular_judges_trigger AFTER INSERT ON judges
+FOR EACH ROW
+BEGIN
+    INSERT INTO popular_judges (judge_id, first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level)
+    SELECT 
+        judge_id, 
+        first_name, 
+        last_name, 
+        contact_number, 
+        date_of_birth, 
+        age, 
+        years_of_experience, 
+        expertise, 
+        cuisine_id, 
+        training_level
+    FROM (
+        SELECT 
+            MIN(judge_id) AS judge_id, 
+            first_name, 
+            last_name, 
+            contact_number, 
+            date_of_birth, 
+            age, 
+            years_of_experience, 
+            expertise, 
+            cuisine_id, 
+            training_level,
+            COUNT(*) AS judge_count
+        FROM judges
+        GROUP BY first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level
+    ) AS judge_counts
+    WHERE judge_count >= 3
+    ON DUPLICATE KEY UPDATE
+        first_name = VALUES(first_name),
+        last_name = VALUES(last_name),
+        contact_number = VALUES(contact_number),
+        date_of_birth = VALUES(date_of_birth),
+        age = VALUES(age),
+        years_of_experience = VALUES(years_of_experience),
+        expertise = VALUES(expertise),
+        cuisine_id = VALUES(cuisine_id),
+        training_level = VALUES(training_level);
+END;
+//
+
+DELIMITER ;
