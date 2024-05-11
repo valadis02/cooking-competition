@@ -1,0 +1,26 @@
+CREATE TABLE average_ratings (
+    chef_id INT PRIMARY KEY,
+    average_rating DECIMAL(4,2) -- Προσαρμόστε το μέγεθος του δεκαδικού ανάλογα με τις απαιτήσεις σας
+);
+
+DELIMITER //
+
+CREATE TRIGGER update_average_rating AFTER INSERT ON Ratings
+FOR EACH ROW
+BEGIN
+    DECLARE avg_rating DECIMAL(4,2);
+    
+    -- Calculate average rating for the chef
+    SELECT AVG(rating) INTO avg_rating
+    FROM Ratings
+    WHERE chef_id = NEW.chef_id;
+
+    -- Update average rating in average_ratings table
+    INSERT INTO average_ratings (chef_id, average_rating)
+    VALUES (NEW.chef_id, avg_rating)
+    ON DUPLICATE KEY UPDATE average_rating = avg_rating;
+END;
+//
+
+DELIMITER ;
+
