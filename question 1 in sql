@@ -24,3 +24,42 @@ END;
 
 DELIMITER ;
 
+CREATE TABLE average_cuisine_ratings (
+    cuisine_id INT PRIMARY KEY,
+    cuisine_name VARCHAR(255),
+    average_rating DECIMAL(4,2)
+);
+
+DELIMITER //
+
+CREATE TRIGGER update_average_cuisine_rating AFTER INSERT ON Ratings
+FOR EACH ROW
+BEGIN
+    DECLARE avg_rating DECIMAL(4,2);
+    DECLARE cuisine_name VARCHAR(255);
+
+    -- Fetch the cuisine name
+    SELECT name INTO cuisine_name
+    FROM Cuisines
+    WHERE cuisine_id = (
+        SELECT cuisine_id
+        FROM Chefs
+        WHERE chef_id = NEW.chef_id
+    );
+
+    -- Calculate average rating for the cuisine
+    SELECT AVG(r.rating) INTO avg_rating
+    FROM Ratings r
+    JOIN Chefs c ON r.chef_id = c.chef_id
+    WHERE c.cuisine_id = NEW.chef_id;
+
+    -- Update average rating in average_cuisine_ratings table
+    INSERT INTO average_cuisine_ratings (cuisine_id, cuisine_name, average_rating)
+    VALUES (NEW.chef_id, cuisine_name, avg_rating)
+    ON DUPLICATE KEY UPDATE average_rating = avg_rating;
+END;
+//
+
+DELIMITER ;
+
+
