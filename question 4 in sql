@@ -1,0 +1,15 @@
+DELIMITER //
+CREATE TRIGGER insert_chef_trigger
+AFTER INSERT ON chefs
+FOR EACH ROW
+BEGIN
+    DECLARE chef_id_count INT;
+    SET chef_id_count = (SELECT COUNT(*) FROM winners WHERE chef_id = NEW.chef_id);
+    IF chef_id_count = 0 THEN
+        INSERT INTO chefs_not_judges (chef_id, first_name, last_name, age, expertise, cuisine_id, contact_number, date_of_birth)
+        VALUES (NEW.chef_id, NEW.first_name, NEW.last_name, NEW.age, NEW.expertise, NEW.cuisine_id, NEW.contact_number, NEW.date_of_birth);
+    END IF;
+END;
+//
+
+DELIMITER ;
