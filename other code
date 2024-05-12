@@ -24,6 +24,15 @@ INSERT INTO Chefs (user_id, national_cuisine, experience_years, specialization, 
 
 INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES
 
+INSERT INTO meal_types (name)
+VALUES 
+    ('breakfast'),
+    ('brunch'),
+    ('lunch'),
+    ('dinner'),
+    ('snack'),
+    ('dessert');
+
 
     (2, 'Italian', 1, 4.5),
     (2, 'Italian', 2, 4.0),
