@@ -77,3 +77,10 @@ VALUES
     (8, 'Bacon and Honey Potato Salad', 'A delicious potato salad with crispy bacon and honey dressing.', 11, 2),
     (9, 'Honey Lime Chicken', 'Juicy grilled chicken marinated in honey and lime.', 13, 3),
     (10, 'Potato Apple Roast', 'A comforting and flavorful roast with potatoes and apples.', 20, 2);
+
+INSERT INTO meal_types (meal_type_id, name)
+VALUES 
+    (7, '-'),
+    (8, '-'),
+    (9, '-'),
+    (10, '-');
