@@ -15,6 +15,15 @@ BEGIN
     DECLARE total_protein DECIMAL(10,2);
     DECLARE total_carbohydrates DECIMAL(10,2);
     DECLARE total_calories INT;
+-- Cursor to loop through ingredients
+    DECLARE ingredient_cursor CURSOR FOR
+        SELECT ri.ingredient_id, ri.quantity
+        FROM RecipeIngredients ri
+        WHERE ri.recipe_id = recipe_id_var;
+    
+    -- Handler for cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+        SET ingredient_id_var = NULL;
     
     -- Get the recipe_id for the current row
     SET recipe_id_var = NEW.recipe_id;
@@ -24,16 +33,6 @@ BEGIN
     SET total_protein = 0;
     SET total_carbohydrates = 0;
     SET total_calories = 0;
-    
-    -- Cursor to loop through ingredients
-    DECLARE ingredient_cursor CURSOR FOR
-        SELECT ri.ingredient_id, ri.quantity
-        FROM RecipeIngredients ri
-        WHERE ri.recipe_id = recipe_id_var;
-    
-    -- Handler for cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND
-        SET ingredient_id_var = NULL;
     
     OPEN ingredient_cursor;
     ingredient_loop: LOOP
