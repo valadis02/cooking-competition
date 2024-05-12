@@ -9,6 +9,12 @@ ADD COLUMN year INT;
 ALTER TABLE nutritionalinfo
 ADD COLUMN recipe_name VARCHAR(255);
 
+CREATE TABLE average2_carbon (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    average_carbon DECIMAL(10, 2)
+);
+
+
 DELIMITER //
 
 CREATE TRIGGER update_average2_carbon_trigger AFTER INSERT ON average_carbon
