@@ -117,3 +117,73 @@ CREATE TABLE ChefCuisine (
     PRIMARY KEY (chef_id, cuisine),
     FOREIGN KEY (chef_id) REFERENCES Chefs(chef_id)
 );
+
+-- Thai Chicken recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (1, 1, '500g'),  
+    (1, 2, '100g'),  
+    (1, 3, '1'); 
+
+-- Turkey Soup recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (2, 4, '600g'),   
+    (2, 2, '100g'); 
+
+-- Ham and Potato Soup recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (3, 5, '400g'), 
+    (3, 6, '200g'),
+    (3, 7, '2'),
+    (3, 8, '200g'); 
+
+-- Battered Herb Chicken recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (4, 1, '400g'),
+    (4, 9, '200g');
+
+-- Kung Pao Chicken recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (5, 1, '600g'),  -- Chicken
+    (5, 10, '100g'),
+    (5, 11, '200g');    
+
+-- One Pot Chicken and Potatoes recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (6, 1, '500g'),  
+    (6, 5, '200'),    
+    (6, 7, '1'),     
+    (6, 12, '2');    
+
+-- Buckwheat Chicken Pilaf recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (7, 1, '600g'),  
+    (7, 7, '3'),    
+    (7, 12, '1'),    
+    (7, 13, '300g'); 
+
+-- Bacon and Honey Potato Salad recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (8, 5, '200g'),  
+    (8, 14, '200g');   
+
+-- Honey Lime Chicken recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (9, 1, '600g'),
+    (9, 9, '200g'); 
+
+-- Potato Apple Roast recipe ingredients
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    (10, 5, '300'),  
+    (10, 8, '200g'),   
+    (10, 15, '4');
+
