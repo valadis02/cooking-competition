@@ -1,0 +1,32 @@
+'''
+# List to store chefs who have never been judges
+chefs_not_judges = []
+
+# Check if a chef has ever been a judge
+def check_if_judge(chef_id):
+    sql = "SELECT COUNT(*) FROM winners WHERE chef_id = %s"
+    val = (chef_id,)
+    cursor.execute(sql, val)
+    result = cursor.fetchone()
+    return result[0] > 0
+
+# Populate chefs_not_judges list and insert into the table
+for chef in chefs:
+    if not check_if_judge(chef.chef_id):
+        # Check if the chef ID already exists in the chefs_not_judges table
+        cursor.execute("SELECT COUNT(*) FROM chefs_not_judges WHERE chef_id = %s", (chef.chef_id,))
+        count = cursor.fetchone()[0]
+        if count == 0:  # Chef ID does not exist in chefs_not_judges table
+            chefs_not_judges.append(chef)
+            # Insert chef into chefs_not_judges table
+            insert_sql = "INSERT INTO chefs_not_judges (chef_id, first_name, last_name, age, expertise, cuisine_id, contact_number, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            insert_val = (chef.chef_id, chef.first_name, chef.last_name, chef.age, chef.expertise, chef.cuisine_id, chef.contact_number, chef.date_of_birth)
+            cursor.execute(insert_sql, insert_val)
+            db.commit()
+
+
+# Print the chefs who have never been judges
+print("Chefs who have never been judges:")
+for chef in chefs_not_judges:
+    print(f"- {chef.first_name} {chef.last_name}")
+    '''
