@@ -8,3 +8,33 @@ ADD COLUMN year INT;
 
 ALTER TABLE nutritionalinfo
 ADD COLUMN recipe_name VARCHAR(255);
+
+DELIMITER //
+
+CREATE TRIGGER update_average2_carbon_trigger AFTER INSERT ON average_carbon
+FOR EACH ROW
+BEGIN
+    DECLARE total_carbon DECIMAL(10, 2);
+    DECLARE current_count INT;
+    
+    -- Get the current count of rows in the average_carbon table
+    SELECT COUNT(*) INTO current_count FROM average_carbon;
+    
+    -- If the current count is a multiple of 100, sum all values in the average_carbon table
+    IF current_count % 100 = 0 THEN
+        -- Calculate the total carbon by summing all values in the average_carbon table
+        SELECT SUM(average_carbon)
+        INTO total_carbon
+        FROM average_carbon;
+        
+        -- Calculate the average carbon by dividing the total carbon by the number of rows
+        SET total_carbon = total_carbon / current_count;
+        
+        -- Replace the existing entry in the average2_carbon table with the new average carbon value
+        REPLACE INTO average2_carbon (average_carbon)
+        VALUES (total_carbon);
+    END IF;
+END;
+//
+
+DELIMITER ;
