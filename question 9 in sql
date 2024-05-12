@@ -9,6 +9,22 @@ ADD COLUMN year INT;
 ALTER TABLE nutritionalinfo
 ADD COLUMN recipe_name VARCHAR(255);
 
+UPDATE nutritionalinfo ni
+JOIN (
+    SELECT 1 AS recipe_id, 'Thai Chicken' AS recipe_name UNION ALL
+    SELECT 2, 'Turkey Soup' UNION ALL
+    SELECT 3, 'Ham and Potato Soup' UNION ALL
+    SELECT 4, 'Batter Herb Chicken' UNION ALL
+    SELECT 5, 'Kung Pao Chicken' UNION ALL
+    SELECT 6, 'One Pot Chicken and Potatoes' UNION ALL
+    SELECT 7, 'Buckwheat Chicken Pilaf' UNION ALL
+    SELECT 8, 'Bacon and Honey Potato Salad' UNION ALL
+    SELECT 9, 'Honey Lime Chicken' UNION ALL
+    SELECT 10, 'Potato Apple Roast'
+) r ON ni.recipe_id = r.recipe_id
+SET ni.recipe_name = r.recipe_name;
+
+
 CREATE TABLE average2_carbon (
     id INT AUTO_INCREMENT PRIMARY KEY,
     average_carbon DECIMAL(10, 2)
