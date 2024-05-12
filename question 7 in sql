@@ -12,11 +12,32 @@ CREATE TABLE chef_min_appearances (
 );
 
 -- Populate the chef_min_appearances table with chefs having 5 or more appearances less than the chef with the maximum appearances
-INSERT INTO chef_min_appearances (chef_id, total_appearances)
-SELECT chef_id, total_appearances
-FROM appearances
-WHERE total_appearances <= (
-    SELECT MAX(total_appearances) - 5
+-- Create a trigger to update chef_min_appearances table after inserting into winners table
+DELIMITER //
+
+CREATE TRIGGER update_chef_min_appearances_trigger AFTER INSERT ON winners
+FOR EACH ROW
+BEGIN
+    DECLARE max_appearances INT;
+    DECLARE min_appearances_threshold INT;
+    
+    -- Find the maximum appearances among chefs
+    SELECT MAX(total_appearances) INTO max_appearances FROM appearances;
+
+    -- Calculate the minimum appearances threshold
+    SET min_appearances_threshold = max_appearances - 5;
+    
+    -- Delete existing records from chef_min_appearances table
+    DELETE FROM chef_min_appearances;
+    
+    -- Insert records into chef_min_appearances for chefs meeting the criteria
+    INSERT INTO chef_min_appearances (chef_id, total_appearances)
+    SELECT chef_id, total_appearances
     FROM appearances
-);
+    WHERE total_appearances <= min_appearances_threshold;
+END;
+//
+
+DELIMITER ;
+
 
