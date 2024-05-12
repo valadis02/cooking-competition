@@ -9,6 +9,10 @@ ADD COLUMN year INT;
 ALTER TABLE nutritionalinfo
 ADD COLUMN recipe_name VARCHAR(255);
 
+ALTER TABLE nutritionalinfo
+ADD COLUMN recipe_name VARCHAR(255);
+
+
 UPDATE nutritionalinfo ni
 JOIN (
     SELECT 1 AS recipe_id, 'Thai Chicken' AS recipe_name UNION ALL
