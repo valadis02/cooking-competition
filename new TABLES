@@ -59,8 +59,13 @@ CREATE TABLE Ingredients (
     ingredient_id INT PRIMARY KEY,
     name VARCHAR(255),
     description TEXT,
-    food_group VARCHAR(255)
+    food_group VARCHAR(255),
+    fat_info DECIMAL(10,2),
+    carbohydrate_info DECIMAL(10,2),
+    protein_info DECIMAL(10,2),
+    calories_per_serving INT
 );
+
 
 CREATE TABLE RecipeIngredients (
     recipe_id INT,
