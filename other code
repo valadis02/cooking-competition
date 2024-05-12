@@ -23,17 +23,6 @@ INSERT INTO Chefs (user_id, national_cuisine, experience_years, specialization, 
     (1, 'Greek', 10, 'Greek Cuisine', 'Chef');
 
 INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES
-
-INSERT INTO meal_types (name)
-VALUES 
-    ('breakfast'),
-    ('brunch'),
-    ('lunch'),
-    ('dinner'),
-    ('snack'),
-    ('dessert');
-
-
     (2, 'Italian', 1, 4.5),
     (2, 'Italian', 2, 4.0),
     (3, 'French', 3, 3.8);
@@ -93,3 +82,13 @@ CREATE TABLE top_rated_judges (
         chef_last_name VARCHAR(255),
         total_rating FLOAT
     )
+
+
+INSERT INTO meal_types (name)
+VALUES 
+    ('breakfast'),
+    ('brunch'),
+    ('lunch'),
+    ('dinner'),
+    ('snack'),
+    ('dessert');
