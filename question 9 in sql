@@ -2,3 +2,6 @@ CREATE TABLE average_carbon (
     year_id INT,
     average_carbon DECIMAL(10, 2)
 );
+
+ALTER TABLE selected_recipes
+ADD COLUMN year INT;
