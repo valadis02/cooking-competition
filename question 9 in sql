@@ -14,6 +14,24 @@ CREATE TABLE average2_carbon (
     average_carbon DECIMAL(10, 2)
 );
 
+CREATE TRIGGER update_average_carbon_trigger AFTER INSERT ON selected_recipes
+FOR EACH ROW
+BEGIN
+    DECLARE total_carbohydrates DECIMAL(10, 2);
+
+    -- Calculate the total carbohydrates per serving for the new recipe
+    SELECT SUM(ni.carbohydrates_per_serving)
+    INTO total_carbohydrates
+    FROM nutritionalinfo ni
+    JOIN selected_recipes sr ON ni.recipe_name = sr.recipe_name
+    WHERE sr.recipe_name = NEW.recipe_name;
+
+    -- Update the average_carbon table
+    INSERT INTO average_carbon (average_carbon)
+    VALUES (total_carbohydrates);
+END;
+
+
 
 DELIMITER //
 
