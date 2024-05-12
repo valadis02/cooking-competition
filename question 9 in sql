@@ -5,3 +5,6 @@ CREATE TABLE average_carbon (
 
 ALTER TABLE selected_recipes
 ADD COLUMN year INT;
+
+ALTER TABLE nutritionalinfo
+ADD COLUMN recipe_name VARCHAR(255);
