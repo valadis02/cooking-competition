@@ -155,8 +155,8 @@ VALUES
 -- One Pot Chicken and Potatoes recipe ingredients
 INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
 VALUES 
-    (6, 1, '5'),  
-    (6, 5, '200'),    
+    (6, 1, '500g'),  
+    (6, 5, '2'),    
     (6, 7, '1'),     
     (6, 12, '2');    
 
