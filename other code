@@ -164,3 +164,42 @@ INSERT INTO RecipeLabels (recipe_id, label_id)
 VALUES 
     (10, 2); 
 
+-- Tip for Thai Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (1,1, 'For a milder flavor, reduce the amount of chili peppers used in this recipe.');
+
+-- Tip for Turkey Soup
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (2,2, 'Garnish each serving of soup with a sprig of fresh parsley for added flavor and presentation.');
+
+-- Tip for Ham and Potato Soup
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (3,3, 'To make this soup even heartier, consider adding diced carrots and celery.');
+
+-- Tip for Batter Herb Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (4,4, 'Marinate the chicken in the herb mixture for at least 1 hour before cooking for maximum flavor.');
+
+-- Tip for Kung Pao Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (5,5, 'Adjust the amount of chili flakes according to your spice preference.');
+
+-- Tip for One Pot Chicken and Potatoes
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (6,6, 'Feel free to add your favorite vegetables to this one-pot dish, such as bell peppers or green beans.');
+
+-- Tip for Buckwheat Chicken Pilaf
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (7,7, 'Toasting the buckwheat before cooking adds a nutty flavor to the pilaf.');
+
+-- Tip for Bacon and Honey Potato Salad
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (8,8, 'For a smokier flavor, use applewood-smoked bacon in this salad.');
+
+-- Tip for Honey Lime Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (9,9, 'Serve this dish with steamed rice and a side of sautéed vegetables for a complete meal.');
+
+-- Tip for Potato Apple Roast
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (10,10, 'Try using a mix of sweet and tart apples for a more complex flavor profile in this dish.');
