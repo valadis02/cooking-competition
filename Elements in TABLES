@@ -64,3 +64,16 @@ VALUES
     (13, 'buckwheat', 'Buckwheat is a gluten-free seed used as a grain-like ingredient in cooking.', 'Grains/Pasta'),
     (14, 'bacon', 'Bacon is a type of salt-cured pork made from various cuts, typically from the pork belly or back cuts.', 'Meat/Poultry'),
     (15, 'apple', 'Apples are a popular fruit consumed fresh or used in cooking and baking.', 'Fruits');
+
+INSERT INTO Recipes (recipe_id, name, description, cuisine, difficulty)
+VALUES 
+    (1, 'Thai Chicken', 'A delicious Thai-inspired chicken dish.', 8, 3),
+    (2, 'Turkey Soup', 'A comforting soup made with turkey and vegetables.', 14, 2),
+    (3, 'Ham and Potato Soup', 'A hearty soup with ham, potatoes, and vegetables.', 1, 2),
+    (4, 'Batter Herb Chicken', 'Crispy herb-coated chicken cooked to perfection.', 2, 4),
+    (5, 'Kung Pao Chicken', 'A spicy and savory Chinese chicken dish with peanuts and vegetables.', 6, 3),
+    (6, 'One Pot Chicken and Potatoes', 'An easy and flavorful one-pot meal with chicken and potatoes.', 4, 2),
+    (7, 'Buckwheat Chicken Pilaf', 'A nutritious and tasty pilaf made with buckwheat and chicken.', 3, 3),
+    (8, 'Bacon and Honey Potato Salad', 'A delicious potato salad with crispy bacon and honey dressing.', 11, 2),
+    (9, 'Honey Lime Chicken', 'Juicy grilled chicken marinated in honey and lime.', 13, 3),
+    (10, 'Potato Apple Roast', 'A comforting and flavorful roast with potatoes and apples.', 20, 2);
