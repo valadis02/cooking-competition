@@ -61,8 +61,7 @@ END;
 
 DELIMITER ;
 
-
-
+ALTER TABLE average2_carbon ADD COLUMN year_id INT;
 
 DELIMITER //
 
@@ -71,7 +70,8 @@ FOR EACH ROW
 BEGIN
     DECLARE total_carbon DECIMAL(10, 2);
     DECLARE current_count INT;
-    
+    DECLARE new_year INT;
+
     -- Get the current count of rows in the average_carbon table
     SELECT COUNT(*) INTO current_count FROM average_carbon;
     
@@ -85,11 +85,12 @@ BEGIN
         -- Calculate the average carbon by dividing the total carbon by the number of rows
         SET total_carbon = total_carbon / current_count;
         
-        -- Replace the existing entry in the average2_carbon table with the new average carbon value
-        REPLACE INTO average2_carbon (average_carbon)
-        VALUES (total_carbon);
+        -- Insert the new average carbon value into the average2_carbon table
+        INSERT INTO average2_carbon (average_carbon, year_id)
+        VALUES (total_carbon, 2000 + current_count / 100);
     END IF;
 END;
 //
 
 DELIMITER ;
+
