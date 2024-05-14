@@ -1,0 +1,32 @@
+-- Δημιουργία του πίνακα selected_cuisines αν δεν υπάρχει ήδη
+CREATE TABLE IF NOT EXISTS selected_cuisines (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cuisine_id INT,
+    name VARCHAR(255),
+    description TEXT
+);
+
+-- Δημιουργία του trigger για εισαγωγή νέων εγγραφών στον πίνακα selected_cuisines
+DELIMITER $$
+
+CREATE TRIGGER after_insert_or_update_selected_recipes
+AFTER INSERT ON selected_recipes
+FOR EACH ROW
+BEGIN
+    DECLARE v_cuisine_id INT;
+    DECLARE v_name VARCHAR(255);
+    DECLARE v_description TEXT;
+
+    -- Ανάκτηση των στοιχείων της κουζίνας βάσει της νέας συνταγής
+    SELECT c.cuisine_id, c.name, c.description 
+    INTO v_cuisine_id, v_name, v_description
+    FROM Recipes r
+    JOIN Cuisines c ON r.cuisine = c.cuisine_id
+    WHERE r.name = NEW.recipe_name;
+
+    -- Εισαγωγή της κουζίνας στον πίνακα selected_cuisines
+    INSERT INTO selected_cuisines (cuisine_id, name, description)
+    VALUES (v_cuisine_id, v_name, v_description);
+END$$
+
+DELIMITER ;
