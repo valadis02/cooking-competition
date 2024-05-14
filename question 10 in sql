@@ -6,7 +6,10 @@ CREATE TABLE IF NOT EXISTS selected_cuisines (
     description TEXT
 );
 
--- Δημιουργία του trigger για εισαγωγή νέων εγγραφών στον πίνακα selected_cuisines
+ALTER TABLE selected_cuisines
+ADD COLUMN year INT;
+
+
 DELIMITER $$
 
 CREATE TRIGGER after_insert_or_update_selected_recipes
@@ -16,6 +19,7 @@ BEGIN
     DECLARE v_cuisine_id INT;
     DECLARE v_name VARCHAR(255);
     DECLARE v_description TEXT;
+    DECLARE v_year INT;
 
     -- Ανάκτηση των στοιχείων της κουζίνας βάσει της νέας συνταγής
     SELECT c.cuisine_id, c.name, c.description 
@@ -24,9 +28,14 @@ BEGIN
     JOIN Cuisines c ON r.cuisine = c.cuisine_id
     WHERE r.name = NEW.recipe_name;
 
-    -- Εισαγωγή της κουζίνας στον πίνακα selected_cuisines
-    INSERT INTO selected_cuisines (cuisine_id, name, description)
-    VALUES (v_cuisine_id, v_name, v_description);
+    -- Υπολογισμός του έτους με βάση τον αριθμό των εγγραφών στον πίνακα selected_cuisines
+    SELECT CEIL((COUNT(*) + 1) / 100) INTO v_year
+    FROM selected_cuisines;
+
+    -- Εισαγωγή της κουζίνας στον πίνακα selected_cuisines με το αντίστοιχο έτος
+    INSERT INTO selected_cuisines (cuisine_id, name, description, year)
+    VALUES (v_cuisine_id, v_name, v_description, 1999 + v_year);
 END$$
 
 DELIMITER ;
+
