@@ -1,1 +1,85 @@
+-- Create the episode_hardness table if it doesn't exist
+CREATE TABLE IF NOT EXISTS episode_hardness (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode_number INT UNIQUE,
+    total_difficulty DECIMAL(5, 2)
+);
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_selected_recipes
+AFTER INSERT ON selected_recipes
+FOR EACH ROW
+BEGIN
+    DECLARE v_episode_number INT;
+    DECLARE v_total_difficulty DECIMAL(5, 2);
+    DECLARE v_count INT;
+
+    -- Get the episode number for the inserted recipe
+    SET v_episode_number = NEW.episode;
+
+    -- Get the total count of selected recipes for the episode
+    SELECT COUNT(*) INTO v_count
+    FROM selected_recipes
+    WHERE episode = v_episode_number;
+
+    -- Check if 30 inserts have been made for the current episode
+    IF v_count % 30 = 0 THEN
+        -- Calculate the sum of difficulties for the current episode
+        SELECT SUM(difficulty) INTO v_total_difficulty
+        FROM selected_recipes sr
+        JOIN recipes r ON sr.recipe_name = r.name
+        WHERE sr.episode = v_episode_number;
+
+        -- Insert or update the sum of difficulties into the episode_hardness table
+        INSERT INTO episode_hardness (episode_number, total_difficulty)
+        VALUES (v_episode_number, v_total_difficulty)
+        ON DUPLICATE KEY UPDATE total_difficulty = VALUES(total_difficulty);
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+CREATE TABLE IF NOT EXISTS the_hardest_episode (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    max_difficulty DECIMAL(5, 2)
+);
+ALTER TABLE the_hardest_episode
+ADD COLUMN episode_number INT;
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER update_hardest_episode
+AFTER INSERT ON selected_recipes
+FOR EACH ROW
+BEGIN
+    DECLARE total_records INT;
+    DECLARE v_max_difficulty DECIMAL(5, 2);
+
+    -- Get the total number of records in selected_recipes table
+    SELECT COUNT(*) INTO total_records FROM selected_recipes;
+
+    -- Check if the total number of records is a multiple of 100
+    IF total_records % 100 = 0 THEN
+        -- Calculate the maximum difficulty from the episode_hardness table
+        
+        SELECT MAX(total_difficulty) INTO v_max_difficulty FROM episode_hardness;
+
+        -- Check if there is an existing record in the_hardest_episode table
+        SELECT COUNT(*) INTO @record_count FROM the_hardest_episode;
+
+        IF @record_count > 0 THEN
+            -- Update the existing record with the new maximum difficulty
+            UPDATE the_hardest_episode SET max_difficulty = v_max_difficulty WHERE id = 1;
+        ELSE
+            -- Insert a new record with the maximum difficulty
+            INSERT INTO the_hardest_episode (max_difficulty) VALUES (v_max_difficulty);
+        END IF;
+    END IF;
+END$$
+
+DELIMITER ;
 
