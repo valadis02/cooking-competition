@@ -1,0 +1,57 @@
+CREATE TABLE selected_chefs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode INT,
+    chef_id INT,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    contact_number VARCHAR(255),
+    date_of_birth DATE,
+    age INT,
+    years_of_experience INT,
+    expertise VARCHAR(255),
+    cuisine_id INT,
+    training_level VARCHAR(255)
+);
+
+CREATE TABLE low_train_episode (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode INT,
+    training_sum INT
+);
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_selected_chef_insert
+AFTER INSERT ON selected_chefs
+FOR EACH ROW
+BEGIN
+    DECLARE training_sum INT;
+    DECLARE chef_sum INT;
+    DECLARE judge_sum INT;
+
+    -- Calculate the sum of training levels for the selected chefs in the current episode
+    SELECT SUM(training_level) INTO chef_sum
+    FROM selected_chefs
+    WHERE episode = NEW.episode;
+    
+    -- Calculate the sum of training levels for all judges
+    SELECT SUM(training_level) INTO judge_sum
+    FROM judges;
+
+    -- Calculate the total training sum
+    SET training_sum = IFNULL(chef_sum, 0) + IFNULL(judge_sum, 0);
+
+    -- Check if an entry for the current episode already exists
+    IF (SELECT COUNT(*) FROM low_train_episode WHERE episode = NEW.episode) = 0 THEN
+        -- Insert the result into the low_train_episode table
+        INSERT INTO low_train_episode (episode, training_sum)
+        VALUES (NEW.episode, training_sum);
+    ELSE
+        -- Update the existing entry
+        UPDATE low_train_episode
+        SET training_sum = training_sum
+        WHERE episode = NEW.episode;
+    END IF;
+END$$
+
+DELIMITER ;
