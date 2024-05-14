@@ -1,1 +1,74 @@
+CREATE TABLE Top_Judges (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    judge_first_name VARCHAR(255),
+    judge_last_name VARCHAR(255),
+    chef_first_name VARCHAR(255),
+    chef_last_name VARCHAR(255),
+    total_rating DECIMAL(10, 2)
+);
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_update_ratings
+AFTER INSERT ON Ratings
+FOR EACH ROW
+BEGIN
+    DECLARE v_total_rating INT;
+    DECLARE v_judge_first_name VARCHAR(255);
+    DECLARE v_judge_last_name VARCHAR(255);
+    DECLARE v_chef_first_name VARCHAR(255);
+    DECLARE v_chef_last_name VARCHAR(255);
+    DECLARE v_counter INT;
+
+    -- Increment the insert counter
+    SET @insert_counter = IFNULL(@insert_counter, 0) + 1;
+
+    -- Check if the counter is a multiple of 300
+    IF @insert_counter % 300 = 0 THEN
+        -- Calculate the total ratings for each judge-chef pair and update Top_Judges
+        DELETE FROM Top_Judges; -- Clear the table before updating
+
+        INSERT INTO Top_Judges (judge_first_name, judge_last_name, chef_first_name, chef_last_name, total_rating)
+        SELECT j.first_name, j.last_name, c.first_name, c.last_name, SUM(r.rating)
+        FROM Ratings r
+        JOIN chefs j ON r.user_id = j.chef_id
+        JOIN chefs c ON r.chef_id = c.chef_id
+        GROUP BY r.user_id, r.chef_id
+        HAVING SUM(r.rating) > 0;
+
+        -- Reset the counter
+        SET @insert_counter = 0;
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- Create the top_5_judges table
+CREATE TABLE top_5_judges (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    judge_first_name VARCHAR(255),
+    judge_last_name VARCHAR(255),
+    chef_first_name VARCHAR(255),
+    chef_last_name VARCHAR(255),
+    total_rating INT
+);
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_update_top_5_judges
+AFTER INSERT ON top_judges
+FOR EACH ROW
+BEGIN
+    -- Delete all rows from top_5_judges
+    DELETE FROM top_5_judges;
+
+    -- Insert the top 5 judges based on total ratings
+    INSERT INTO top_5_judges (judge_first_name, judge_last_name, chef_first_name, chef_last_name, total_rating)
+    SELECT judge_first_name, judge_last_name, chef_first_name, chef_last_name, total_rating
+    FROM top_judges
+    ORDER BY total_rating DESC
+    LIMIT 5;
+END$$
+
+DELIMITER ;
 
