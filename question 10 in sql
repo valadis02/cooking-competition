@@ -39,3 +39,44 @@ END$$
 
 DELIMITER ;
 
+CREATE TABLE IF NOT EXISTS cuisine_participations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cuisine_id INT,
+    year INT,
+    participations INT,
+    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id)
+);
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_selected_cuisines
+AFTER INSERT ON selected_cuisines
+FOR EACH ROW
+BEGIN
+    DECLARE v_cuisine_id INT;
+    DECLARE v_year INT;
+    DECLARE v_count INT;
+
+    -- Get the cuisine ID and year of the new entry
+    SET v_cuisine_id = NEW.cuisine_id;
+    SET v_year = NEW.year;
+
+    -- Check if there is an existing record for the cuisine in the specified year
+    SELECT COUNT(*) INTO v_count
+    FROM cuisine_participations
+    WHERE cuisine_id = v_cuisine_id AND year = v_year;
+
+    -- If no record exists, insert a new one; otherwise, update the existing one
+    IF v_count = 0 THEN
+        INSERT INTO cuisine_participations (cuisine_id, year, participations)
+        VALUES (v_cuisine_id, v_year, 1);
+    ELSE
+        UPDATE cuisine_participations
+        SET participations = participations + 1
+        WHERE cuisine_id = v_cuisine_id AND year = v_year;
+    END IF;
+END$$
+
+DELIMITER ;
+
+
