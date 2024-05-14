@@ -90,6 +90,10 @@ CREATE TABLE IF NOT EXISTS cuisine_same_participations (
     FOREIGN KEY (cuisine_id_2) REFERENCES Cuisines(cuisine_id)
 );
 
+-- Drop the existing trigger if it exists
+DROP TRIGGER IF EXISTS after_insert_cuisine_participations;
+
+-- Create the new trigger
 DELIMITER $$
 
 CREATE TRIGGER after_insert_cuisine_participations
@@ -97,13 +101,9 @@ AFTER INSERT ON cuisine_participations
 FOR EACH ROW
 BEGIN
     DECLARE v_total_entries INT;
+    DECLARE v_year1 INT;
     DECLARE v_year2 INT;
-        DECLARE v_year1 INT;
-        DECLARE v_cuisine_id1 INT;
-        DECLARE v_cuisine_id2 INT;
-        DECLARE v_participations INT;
-    DECLARE v_count INT;
-
+    DECLARE v_participations INT;
 
     -- Get the total number of entries in the cuisine_participations table
     SELECT COUNT(*) INTO v_total_entries
@@ -111,32 +111,28 @@ BEGIN
 
     -- Check if the total number of entries is divisible by 10
     IF v_total_entries % 10 = 0 THEN
-
-        -- Get the year and cuisine_id of the new entry
+        -- Get the year and participations of the new entry
         SET v_year2 = NEW.year;
-        SET v_cuisine_id2 = NEW.cuisine_id;
         SET v_participations = NEW.participations;
 
         -- Get the previous year
         SET v_year1 = v_year2 - 1;
 
-        -- Check if there is a record for the previous year
-        SELECT COUNT(*) INTO v_count
-        FROM cuisine_participations
-        WHERE year = v_year1;
-
-        IF v_count > 0 THEN
-            -- Check if there are cuisines with the same participations in consecutive years
-            INSERT INTO cuisine_same_participations (cuisine_id_1, cuisine_id_2, year1, year2, participations)
-            SELECT cp1.cuisine_id, cp2.cuisine_id, v_year1, v_year2, cp1.participations
-            FROM cuisine_participations cp1
-            JOIN cuisine_participations cp2 ON cp1.cuisine_id != cp2.cuisine_id
-            WHERE cp1.year = v_year1 AND cp2.year = v_year2 AND cp1.participations = cp2.participations AND cp1.participations > 3;
-        END IF;
+        -- Insert cuisines with the same participations and same cuisine_id in consecutive years
+        INSERT INTO cuisine_same_participations (cuisine_id_1, cuisine_id_2, year1, year2, participations)
+        SELECT cp1.cuisine_id, cp2.cuisine_id, cp1.year, cp2.year, cp1.participations
+        FROM cuisine_participations cp1
+        JOIN cuisine_participations cp2 
+        ON cp1.cuisine_id = cp2.cuisine_id
+        WHERE cp1.year = v_year1 
+        AND cp2.year = v_year2 
+        AND cp1.participations = cp2.participations
+        AND cp1.participations > 3;
     END IF;
 END$$
 
 DELIMITER ;
+
 
 
 
