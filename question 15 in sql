@@ -20,6 +20,9 @@ BEGIN
     FROM recipes r
     WHERE r.recipe_id = NEW.recipe_id;
 END;
+//
+
+DELIMITER ;
 
 -- Create the trigger for not_selected_meal_types
 CREATE TRIGGER after_insert_selected_meal_types
