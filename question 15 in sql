@@ -5,3 +5,54 @@ CREATE TABLE SelectedFoodGroups (
     FOREIGN KEY (food_group_id) REFERENCES FoodGroups(food_group_id)
 );
 
+-- Trigger to insert food groups into SelectedFoodGroups after inserting a recipe into SelectedRecipes
+DELIMITER //
+
+CREATE TRIGGER insert_food_groups_after_recipe
+AFTER INSERT ON Selected_Recipes
+FOR EACH ROW
+BEGIN
+    -- Insert associated food groups into SelectedFoodGroups
+    INSERT INTO SelectedFoodGroups (recipe_name, food_group_id)
+    SELECT NEW.recipe_name, fga.food_group_id
+    FROM FoodGroupAssociations fga
+    JOIN Recipes r ON fga.recipe_id = r.recipe_id
+    WHERE r.name = NEW.recipe_name;
+END//
+
+DELIMITER ;
+
+-- Create FoundFoodGroups table
+CREATE TABLE FoundFoodGroups (
+    food_group_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT,
+    count INT DEFAULT 0,
+    FOREIGN KEY (food_group_id) REFERENCES FoodGroups(food_group_id)
+);
+
+-- Initialize FoundFoodGroups with all food groups set to count 0
+INSERT INTO FoundFoodGroups (food_group_id, name, description, count)
+SELECT fg.food_group_id, fg.name, fg.description, 0
+FROM FoodGroups fg
+ON DUPLICATE KEY UPDATE count = count;
+
+-- Create the trigger to update FoundFoodGroups after inserting a recipe into SelectedRecipes
+DELIMITER //
+
+CREATE TRIGGER update_found_food_groups
+AFTER INSERT ON SelectedRecipes
+FOR EACH ROW
+BEGIN
+    -- Update the count of the food groups in FoundFoodGroups
+    UPDATE FoundFoodGroups ff
+    JOIN (
+        SELECT fga.food_group_id
+        FROM FoodGroupAssociations fga
+        JOIN Recipes r ON fga.recipe_id = r.recipe_id
+        WHERE r.name = NEW.recipe_name
+    ) AS temp ON ff.food_group_id = temp.food_group_id
+    SET ff.count = ff.count + 1;
+END//
+
+DELIMITER ;
