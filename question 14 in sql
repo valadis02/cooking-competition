@@ -5,3 +5,88 @@ VALUES
     (3, 'Comfort Food', 'Recipes that provide comfort and nostalgia.'),
     (4, 'Festive', 'Recipes perfect for festive occasions and celebrations.'),
     (5, 'Spicy', 'Recipes that are hot and spicy.');
+
+
+INSERT INTO RecipeThemeRelations (recipe_id, theme_id)
+VALUES 
+    (1, 5), -- Thai Chicken -> Spicy
+    (2, 3), -- Turkey Soup -> Comfort Food
+    (3, 3), -- Ham and Potato Soup -> Comfort Food
+    (4, 2), -- Batter Herb Chicken -> Quick & Easy
+    (5, 5), -- Kung Pao Chicken -> Spicy
+    (6, 2), -- One Pot Chicken and Potatoes -> Quick & Easy
+    (7, 1), -- Buckwheat Chicken Pilaf -> Healthy
+    (8, 2), -- Bacon and Honey Potato Salad -> Quick & Easy
+    (9, 1), -- Honey Lime Chicken -> Healthy
+    (10, 3); -- Potato Apple Roast -> Comfort Food
+
+CREATE TABLE FrequentRecipeThemes (
+    theme_id INT,
+    name VARCHAR(255),
+    description TEXT,
+    frequency INT,
+    PRIMARY KEY (theme_id),
+    FOREIGN KEY (theme_id) REFERENCES RecipeThemes(theme_id)
+);
+
+DELIMITER //
+
+CREATE TRIGGER update_frequent_recipe_themes AFTER INSERT ON SelectedRecipes
+FOR EACH ROW
+BEGIN
+    DECLARE themeCount INT;
+    
+    -- Get all the themes associated with the newly selected recipe
+    INSERT INTO FrequentRecipeThemes (theme_id, name, description, frequency)
+    SELECT rt.theme_id, rt.name, rt.description, COUNT(*) AS frequency
+    FROM SelectedRecipes sr
+    JOIN RecipeThemeAssociations rta ON sr.recipe_id = rta.recipe_id
+    JOIN RecipeThemes rt ON rta.theme_id = rt.theme_id
+    WHERE rt.theme_id NOT IN (SELECT theme_id FROM FrequentRecipeThemes)
+    GROUP BY rt.theme_id, rt.name, rt.description;
+
+    -- Update the frequency for existing themes in FrequentRecipeThemes
+    UPDATE FrequentRecipeThemes frt
+    JOIN (
+        SELECT rt.theme_id, COUNT(*) AS frequency
+        FROM SelectedRecipes sr
+        JOIN RecipeThemeAssociations rta ON sr.recipe_id = rta.recipe_id
+        JOIN RecipeThemes rt ON rta.theme_id = rt.theme_id
+        GROUP BY rt.theme_id
+    ) AS calculated ON frt.theme_id = calculated.theme_id
+    SET frt.frequency = calculated.frequency;
+END//
+
+DELIMITER ;
+
+-- Step 1: Create the TheMostFrequentTheme table
+CREATE TABLE TheMostFrequentTheme (
+    theme_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT,
+    frequency INT,
+    FOREIGN KEY (theme_id) REFERENCES RecipeThemes(theme_id)
+);
+
+-- Step 2: Create the trigger to update TheMostFrequentTheme
+DELIMITER //
+
+CREATE TRIGGER update_most_frequent_theme AFTER INSERT ON FrequentRecipeThemes
+FOR EACH ROW
+BEGIN
+    DECLARE max_frequency INT;
+
+    -- Get the maximum frequency from FrequentRecipeThemes
+    SELECT MAX(frequency) INTO max_frequency FROM FrequentRecipeThemes;
+
+    -- Delete the existing record(s) from TheMostFrequentTheme
+    DELETE FROM TheMostFrequentTheme;
+
+    -- Insert the theme(s) with the maximum frequency into TheMostFrequentTheme
+    INSERT INTO TheMostFrequentTheme (theme_id, name, description, frequency)
+    SELECT theme_id, name, description, frequency
+    FROM FrequentRecipeThemes
+    WHERE frequency = max_frequency;
+END//
+
+DELIMITER ;
