@@ -1,1 +1,7 @@
+CREATE TABLE SelectedFoodGroups (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    recipe_name VARCHAR(255),
+    food_group_id INT,
+    FOREIGN KEY (food_group_id) REFERENCES FoodGroups(food_group_id)
+);
 
