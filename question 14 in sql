@@ -1,0 +1,7 @@
+INSERT INTO RecipeThemes (theme_id, name, description)
+VALUES 
+    (1, 'Healthy', 'Recipes that are nutritious and good for your health.'),
+    (2, 'Quick & Easy', 'Recipes that can be prepared quickly with minimal effort.'),
+    (3, 'Comfort Food', 'Recipes that provide comfort and nostalgia.'),
+    (4, 'Festive', 'Recipes perfect for festive occasions and celebrations.'),
+    (5, 'Spicy', 'Recipes that are hot and spicy.');
