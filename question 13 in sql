@@ -19,39 +19,158 @@ CREATE TABLE low_train_episode (
     training_sum INT
 );
 
+//edo eimai kane drop trigger
+
 DELIMITER $$
 
 CREATE TRIGGER trg_after_selected_chef_insert
 AFTER INSERT ON selected_chefs
 FOR EACH ROW
 BEGIN
+    DECLARE chef_count INT;
     DECLARE training_sum INT;
     DECLARE chef_sum INT;
-    DECLARE judge_sum INT;
 
-    -- Calculate the sum of training levels for the selected chefs in the current episode
-    SELECT SUM(training_level) INTO chef_sum
+    -- Count the number of chefs for the current episode
+    SELECT COUNT(*) INTO chef_count
     FROM selected_chefs
     WHERE episode = NEW.episode;
-    
-    -- Calculate the sum of training levels for all judges
-    SELECT SUM(training_level) INTO judge_sum
-    FROM judges;
 
-    -- Calculate the total training sum
-    SET training_sum = IFNULL(chef_sum, 0) + IFNULL(judge_sum, 0);
+    -- Check if the count of chefs for the current episode is a multiple of 10
+    IF MOD(chef_count, 10) = 0 THEN
+        -- Calculate the sum of training levels for the last 10 chefs in the current episode
+        SELECT SUM(training_level) INTO chef_sum
+        FROM (
+            SELECT training_level
+            FROM selected_chefs
+            WHERE episode = NEW.episode
+            ORDER BY id DESC
+            LIMIT 10
+        ) AS limited_chefs;
 
-    -- Check if an entry for the current episode already exists
-    IF (SELECT COUNT(*) FROM low_train_episode WHERE episode = NEW.episode) = 0 THEN
-        -- Insert the result into the low_train_episode table
-        INSERT INTO low_train_episode (episode, training_sum)
-        VALUES (NEW.episode, training_sum);
-    ELSE
-        -- Update the existing entry
-        UPDATE low_train_episode
-        SET training_sum = training_sum
-        WHERE episode = NEW.episode;
+        -- Check if an entry for the current episode already exists in low_train_episode
+        IF (SELECT COUNT(*) FROM low_train_episode WHERE episode = NEW.episode) = 0 THEN
+            -- Insert the result into the low_train_episode table
+            INSERT INTO low_train_episode (episode, training_sum)
+            VALUES (NEW.episode, IFNULL(chef_sum, 0));
+        ELSE
+            -- Update the existing entry by adding the new sum
+            UPDATE low_train_episode
+            SET training_sum = training_sum + IFNULL(chef_sum, 0)
+            WHERE episode = NEW.episode;
+        END IF;
     END IF;
 END$$
 
 DELIMITER ;
+
+CREATE TABLE low_train_episode2 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode_id INT,
+    training_sum INT
+);
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_judge_insert
+AFTER INSERT ON judges
+FOR EACH ROW
+BEGIN
+    DECLARE judge_count INT;
+    DECLARE training_sum INT;
+
+    -- Count the number of judges
+    SELECT COUNT(*) INTO judge_count
+    FROM judges;
+
+    -- Check if the count of judges is a multiple of 3
+    IF MOD(judge_count, 3) = 0 THEN
+        -- Calculate the sum of training levels for the last 3 judges
+        SELECT SUM(c.training_level) INTO training_sum
+        FROM (
+            SELECT j.chef_id
+            FROM judges j
+            ORDER BY j.id DESC
+            LIMIT 3
+        ) AS last_judges
+        JOIN chefs c ON last_judges.chef_id = c.chef_id;
+
+        -- Insert the result into the low_train_episode2 table
+        INSERT INTO low_train_episode2 (episode_id, training_sum)
+        VALUES ((judge_count / 3), IFNULL(training_sum, 0));
+    END IF;
+END$$
+
+DELIMITER ;
+
+CREATE TABLE low_train_episode3 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode_id INT,
+    training_sum INT
+);
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_insert_low_train_episode2
+AFTER INSERT ON low_train_episode2
+FOR EACH ROW
+BEGIN
+    DECLARE training_sum1 INT;
+    DECLARE training_sum2 INT;
+
+    -- Get the training_sum from low_train_episode for the corresponding episode
+    SELECT training_sum INTO training_sum1
+    FROM low_train_episode
+    WHERE episode = NEW.episode_id
+    LIMIT 1;
+
+    -- Get the training_sum from low_train_episode2 for the corresponding episode
+    SELECT training_sum INTO training_sum2
+    FROM low_train_episode2
+    WHERE episode_id = NEW.episode_id
+    LIMIT 1;
+
+    -- Insert the summed training_sum into low_train_episode3
+    INSERT INTO low_train_episode3 (episode_id, training_sum)
+    VALUES (NEW.episode_id, IFNULL(training_sum1, 0) + IFNULL(training_sum2, 0));
+END$$
+
+DELIMITER ;
+
+CREATE TABLE the_lowest_trained_episode (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode_id INT,
+    training_level INT
+);
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_insert_low_train_episode3
+AFTER INSERT ON low_train_episode3
+FOR EACH ROW
+BEGIN
+    DECLARE lowest_episode_id INT;
+    DECLARE lowest_training_sum INT;
+
+    -- Find the episode with the lowest training sum
+    SELECT episode_id, training_sum
+    INTO lowest_episode_id, lowest_training_sum
+    FROM low_train_episode3
+    ORDER BY training_sum ASC
+    LIMIT 1;
+
+    -- Update the_lowest_trained_episode table
+    IF (SELECT COUNT(*) FROM the_lowest_trained_episode) = 0 THEN
+        -- If the table is empty, insert the first row
+        INSERT INTO the_lowest_trained_episode (episode_id, training_level)
+        VALUES (lowest_episode_id, lowest_training_sum);
+    ELSE
+        -- Update the existing row
+        UPDATE the_lowest_trained_episode
+        SET episode_id = lowest_episode_id, training_level = lowest_training_sum
+        WHERE id = 1;
+    END IF;
+END$$
+
+DELIMITER ;
+
