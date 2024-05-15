@@ -13,13 +13,6 @@ CREATE TABLE selected_chefs (
     training_level VARCHAR(255)
 );
 
-CREATE TABLE low_train_episode (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    episode INT,
-    training_sum INT
-);
-
-//edo eimai kane drop trigger
 
 DELIMITER $$
 
@@ -64,9 +57,22 @@ END$$
 
 DELIMITER ;
 
+-- Create the low_train_episode table
+CREATE TABLE low_train_episode (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode INT,
+    training_sum INT
+);
+
+-- Create the low_train_episode2 table
 CREATE TABLE low_train_episode2 (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    episode_id INT,
+    training_sum INT
+);
+
+-- Create the low_train_episode3 table
+CREATE TABLE low_train_episode3 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     training_sum INT
 );
 
@@ -88,26 +94,20 @@ BEGIN
         -- Calculate the sum of training levels for the last 3 judges
         SELECT SUM(c.training_level) INTO training_sum
         FROM (
-            SELECT j.chef_id
+            SELECT j.first_name
             FROM judges j
-            ORDER BY j.id DESC
+            ORDER BY j.judge_id DESC
             LIMIT 3
         ) AS last_judges
-        JOIN chefs c ON last_judges.chef_id = c.chef_id;
+        JOIN chefs c ON last_judges.first_name = c.first_name;
 
         -- Insert the result into the low_train_episode2 table
-        INSERT INTO low_train_episode2 (episode_id, training_sum)
-        VALUES ((judge_count / 3), IFNULL(training_sum, 0));
+        INSERT INTO low_train_episode2 (training_sum)
+        VALUES (IFNULL(training_sum, 0));
     END IF;
 END$$
 
 DELIMITER ;
-
-CREATE TABLE low_train_episode3 (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    episode_id INT,
-    training_sum INT
-);
 
 DELIMITER $$
 
@@ -118,21 +118,27 @@ BEGIN
     DECLARE training_sum1 INT;
     DECLARE training_sum2 INT;
 
-    -- Get the training_sum from low_train_episode for the corresponding episode
+    -- Get the training_sum from low_train_episode for the corresponding id
     SELECT training_sum INTO training_sum1
     FROM low_train_episode
-    WHERE episode = NEW.episode_id
+    WHERE id = NEW.id
     LIMIT 1;
 
-    -- Get the training_sum from low_train_episode2 for the corresponding episode
+    -- Get the training_sum from low_train_episode2 for the corresponding id
     SELECT training_sum INTO training_sum2
     FROM low_train_episode2
-    WHERE episode_id = NEW.episode_id
+    WHERE id = NEW.id
     LIMIT 1;
 
-    -- Insert the summed training_sum into low_train_episode3
-    INSERT INTO low_train_episode3 (episode_id, training_sum)
-    VALUES (NEW.episode_id, IFNULL(training_sum1, 0) + IFNULL(training_sum2, 0));
+    -- Insert or update the summed training_sum into low_train_episode3
+    IF (SELECT COUNT(*) FROM low_train_episode3 WHERE id = NEW.id) = 0 THEN
+        INSERT INTO low_train_episode3 (id, training_sum)
+        VALUES (NEW.id, IFNULL(training_sum1, 0) + IFNULL(training_sum2, 0));
+    ELSE
+        UPDATE low_train_episode3
+        SET training_sum = IFNULL(training_sum1, 0) + IFNULL(training_sum2, 0)
+        WHERE id = NEW.id;
+    END IF;
 END$$
 
 DELIMITER ;
@@ -153,7 +159,7 @@ BEGIN
     DECLARE lowest_training_sum INT;
 
     -- Find the episode with the lowest training sum
-    SELECT episode_id, training_sum
+    SELECT id, training_sum
     INTO lowest_episode_id, lowest_training_sum
     FROM low_train_episode3
     ORDER BY training_sum ASC
@@ -173,4 +179,5 @@ BEGIN
 END$$
 
 DELIMITER ;
+
 
