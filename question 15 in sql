@@ -9,6 +9,7 @@ CREATE TABLE not_selected_meal_types (
     meal_type VARCHAR(255) PRIMARY KEY
 );
 
+DELIMITER //
 -- Create the trigger
 CREATE TRIGGER after_insert_selected_recipes
 AFTER INSERT ON selected_recipes
