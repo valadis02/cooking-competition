@@ -32,3 +32,27 @@ END//
 
 DELIMITER ;
 
+-- Step 4: Create the most_found_equipment table
+CREATE TABLE most_found_equipment (
+    equipment_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    instructions TEXT,
+    count INT
+);
+
+-- Step 5: Create a trigger to update the most_found_equipment table
+DELIMITER //
+
+CREATE TRIGGER update_most_found_equipment
+AFTER INSERT ON Selected_Recipes
+FOR EACH ROW
+BEGIN
+    -- Find the equipment with the maximum count and update most_found_equipment table
+    REPLACE INTO most_found_equipment (equipment_id, name, instructions, count)
+    SELECT equipment_id, name, instructions, count
+    FROM found_equipment
+    WHERE count = (SELECT MAX(count) FROM found_equipment);
+END//
+
+DELIMITER ;
+
