@@ -79,12 +79,40 @@ SELECT
     fl2.label_id AS label_id2,
     (fl1.count + fl2.count) AS total_count
 FROM 
+    FoundLabels fl1
+JOIN 
+    FoundLabels fl2 ON fl1.label_id < fl2.label_id
+ORDER BY 
+    total_count DESC
+LIMIT 3;
+
+
+EXPLAIN
+SELECT 
+    fl1.label_id AS label_id1,
+    fl2.label_id AS label_id2,
+    (fl1.count + fl2.count) AS total_count
+FROM 
     FoundLabels fl1 FORCE INDEX (idx_count)
 JOIN 
     FoundLabels fl2 FORCE INDEX (idx_count) ON fl1.label_id < fl2.label_id
 ORDER BY 
     total_count DESC
 LIMIT 3;
+
+EXPLAIN
+SELECT 
+    fl1.label_id AS label_id1,
+    fl2.label_id AS label_id2,
+    (fl1.count + fl2.count) AS total_count
+FROM 
+    FoundLabels fl1
+JOIN 
+    FoundLabels fl2 ON fl1.label_id < fl2.label_id
+ORDER BY 
+    total_count DESC
+LIMIT 3;
+
 
 EXPLAIN
 SELECT 
