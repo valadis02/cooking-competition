@@ -63,4 +63,13 @@ END//
 
 DELIMITER ;
 
+-- Προσθήκη index στο πεδίο count στον πίνακα FoundLabels
+CREATE INDEX idx_count ON FoundLabels (count);
+
+-- Προσθήκη index στα πεδία recipe_id και label_id στον πίνακα RecipeLabels
+CREATE INDEX idx_recipe_id ON RecipeLabels (recipe_id);
+CREATE INDEX idx_label_id ON RecipeLabels (label_id);
+
+-- Προσθήκη index στο πεδίο name στον πίνακα Recipes
+CREATE INDEX idx_name ON Recipes (name);
 
