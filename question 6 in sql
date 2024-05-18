@@ -1,1 +1,31 @@
+CREATE TABLE FoundLabels (
+    label_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    description TEXT,
+    count INT DEFAULT 0
+);
+
+INSERT INTO FoundLabels (label_id, name, description, count)
+SELECT l.label_id, l.name, l.description, 0
+FROM Labels l
+ON DUPLICATE KEY UPDATE count = count;
+
+DELIMITER //
+
+CREATE TRIGGER update_found_labels
+AFTER INSERT ON SelectedRecipes
+FOR EACH ROW
+BEGIN
+    -- Update the count of the labels in FoundLabels
+    UPDATE FoundLabels fl
+    JOIN (
+        SELECT rl.label_id
+        FROM RecipeLabels rl
+        JOIN Recipes r ON rl.recipe_id = r.recipe_id
+        WHERE r.name = NEW.recipe_name
+    ) AS temp ON fl.label_id = temp.label_id
+    SET fl.count = fl.count + 1;
+END//
+
+DELIMITER ;
 
