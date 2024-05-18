@@ -13,7 +13,7 @@ ON DUPLICATE KEY UPDATE count = count;
 DELIMITER //
 
 CREATE TRIGGER update_found_labels
-AFTER INSERT ON SelectedRecipes
+AFTER INSERT ON Selected_Recipes
 FOR EACH ROW
 BEGIN
     -- Update the count of the labels in FoundLabels
@@ -28,4 +28,39 @@ BEGIN
 END//
 
 DELIMITER ;
+
+CREATE TABLE top_3_labels (
+    label_id1 INT,
+    label_id2 INT,
+    total_count INT,
+    PRIMARY KEY (label_id1, label_id2),
+    FOREIGN KEY (label_id1) REFERENCES Labels(label_id),
+    FOREIGN KEY (label_id2) REFERENCES Labels(label_id)
+);
+
+DELIMITER //
+
+CREATE TRIGGER update_top_3_labels
+AFTER INSERT ON Selected_Recipes
+FOR EACH ROW
+BEGIN
+    -- Refresh the top_3_labels table
+    DELETE FROM top_3_labels;
+
+    INSERT INTO top_3_labels (label_id1, label_id2, total_count)
+    SELECT 
+        fl1.label_id AS label_id1,
+        fl2.label_id AS label_id2,
+        (fl1.count + fl2.count) AS total_count
+    FROM 
+        FoundLabels fl1
+    JOIN 
+        FoundLabels fl2 ON fl1.label_id < fl2.label_id
+    ORDER BY 
+        total_count DESC
+    LIMIT 3;
+END//
+
+DELIMITER ;
+
 
