@@ -266,3 +266,19 @@ CREATE TABLE ChefCuisine (
     PRIMARY KEY (chef_id, cuisine),
     FOREIGN KEY (chef_id) REFERENCES Chefs(chef_id)
 );
+
+CREATE TABLE chefs (
+    chef_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    contact_number VARCHAR(20),
+    date_of_birth DATE,
+    age INT,
+    years_of_experience INT,
+    expertise VARCHAR(255),
+    cuisine_id INT,
+    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id),
+    -- Προσθήκη πεδίου για επαγγελματική κατάρτιση (με κατηγορίες από Γ' μάγειρας έως αρχιμάγειρας)
+    -- Τα επίπεδα κατάρτισης θα αποθηκεύονται ως αριθμοί από 1 έως 5, με 5 να αντιστοιχεί στο υψηλότερο επίπεδο
+    training_level INT CHECK (training_level >= 1 AND training_level <= 5)
+);
