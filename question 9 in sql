@@ -6,7 +6,7 @@ CREATE TABLE average_carbon (
 ALTER TABLE average_carbon
 ADD PRIMARY KEY (year_id);
 
-
+**
 UPDATE nutritionalinfo ni
 JOIN (
     SELECT 1 AS recipe_id, 'Thai Chicken' AS recipe_name UNION ALL
@@ -21,7 +21,7 @@ JOIN (
     SELECT 10, 'Potato Apple Roast'
 ) r ON ni.recipe_id = r.recipe_id
 SET ni.recipe_name = r.recipe_name;
-
+**
 
 CREATE TABLE average2_carbon (
     id INT AUTO_INCREMENT PRIMARY KEY,
