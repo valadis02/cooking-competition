@@ -13,6 +13,8 @@ SELECT l.label_id, l.name, l.description, 0
 FROM Labels l
 ON DUPLICATE KEY UPDATE count = count;
 
+**mexri edo
+
 DELIMITER //
 
 CREATE TRIGGER update_found_labels
