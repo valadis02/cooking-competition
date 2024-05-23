@@ -40,19 +40,34 @@ CREATE TABLE most_found_equipment (
     count INT
 );
 
--- Step 5: Create a trigger to update the most_found_equipment table
 DELIMITER //
 
 CREATE TRIGGER update_most_found_equipment
 AFTER INSERT ON Selected_Recipes
 FOR EACH ROW
 BEGIN
-    -- Find the equipment with the maximum count and update most_found_equipment table
-    REPLACE INTO most_found_equipment (equipment_id, name, instructions, count)
-    SELECT equipment_id, name, instructions, count
+    DECLARE max_count INT;
+    DECLARE max_equipment_id INT;
+    DECLARE max_name VARCHAR(255);
+    DECLARE max_instructions TEXT;
+
+    -- Βρείτε το μέγιστο count από τον πίνακα found_equipment
+    SELECT MAX(count) INTO max_count FROM found_equipment;
+
+    -- Βρείτε το εξοπλισμό με το μέγιστο count
+    SELECT equipment_id, name, instructions INTO max_equipment_id, max_name, max_instructions
     FROM found_equipment
-    WHERE count = (SELECT MAX(count) FROM found_equipment);
+    WHERE count = max_count
+    LIMIT 1;
+
+    -- Διαγραφή της παλιάς εγγραφής
+    DELETE FROM most_found_equipment;
+
+    -- Εισαγωγή της νέας εγγραφής
+    INSERT INTO most_found_equipment (equipment_id, name, instructions, count)
+    VALUES (max_equipment_id, max_name, max_instructions, max_count);
 END//
 
 DELIMITER ;
+
 
