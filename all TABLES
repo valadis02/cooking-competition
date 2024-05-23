@@ -194,10 +194,11 @@ CREATE TABLE winners (
     episode INT
 );
 
+
 CREATE TABLE selected_recipes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     episode INT,
     recipe_name VARCHAR(255),
-    year INT,
-    FOREIGN KEY (episode) REFERENCES Episodes(episode_id)
+    year INT
 );
+
