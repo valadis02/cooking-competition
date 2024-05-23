@@ -5,6 +5,9 @@ CREATE TABLE FoundLabels (
     count INT DEFAULT 0
 );
 
+ALTER TABLE labels
+ADD COLUMN description TEXT;
+
 INSERT INTO FoundLabels (label_id, name, description, count)
 SELECT l.label_id, l.name, l.description, 0
 FROM Labels l
