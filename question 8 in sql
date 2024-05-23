@@ -12,8 +12,6 @@ SELECT e.equipment_id, e.name, e.instructions, 0
 FROM Equipment e
 ON DUPLICATE KEY UPDATE count = count;
 
-**mexri edo
-
 -- Step 3: Create a trigger to update the count in found_equipment
 DELIMITER //
 
