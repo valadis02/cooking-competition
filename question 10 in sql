@@ -26,7 +26,7 @@ BEGIN
     INTO v_cuisine_id, v_name, v_description
     FROM Recipes r
     JOIN Cuisines c ON r.cuisine = c.cuisine_id
-    WHERE r.name = NEW.recipe_name;
+    WHERE r.recipe_name = NEW.recipe_name;
 
     -- Υπολογισμός του έτους με βάση τον αριθμό των εγγραφών στον πίνακα selected_cuisines
     SELECT CEIL((COUNT(*) + 1) / 100) INTO v_year
