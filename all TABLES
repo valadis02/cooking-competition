@@ -55,7 +55,7 @@ CREATE TABLE Ratings (
 
 CREATE TABLE Recipes (
     recipe_id INT PRIMARY KEY,
-    name VARCHAR(255),
+    recipe_name VARCHAR(255),
     description TEXT,
     cuisine INT,
     difficulty INT,
