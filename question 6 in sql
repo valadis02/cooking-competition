@@ -25,7 +25,7 @@ BEGIN
         SELECT rl.label_id
         FROM RecipeLabels rl
         JOIN Recipes r ON rl.recipe_id = r.recipe_id
-        WHERE r.name = NEW.recipe_name
+        WHERE r.recipe_name = NEW.recipe_name
     ) AS temp ON fl.label_id = temp.label_id
     SET fl.count = fl.count + 1;
 END//
