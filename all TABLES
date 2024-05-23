@@ -4,103 +4,10 @@ CREATE TABLE Cuisines (
     description TEXT
 );
 
-CREATE TABLE Recipes (
-    recipe_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    description TEXT,
-    cuisine_id INT,
-    difficulty_level INT,
-    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id)
-);
-
-CREATE TABLE Meal_Types (
-    meal_type_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255)
-);
-
-CREATE TABLE Recipe_Meal_Types (
-    recipe_id INT,
-    meal_type_id INT,
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
-    FOREIGN KEY (meal_type_id) REFERENCES Meal_Types(meal_type_id)
-);
-
-CREATE TABLE Recipe_Categories (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255)
-);
-
-CREATE TABLE Recipe_Category_Labels (
-    recipe_id INT,
-    category_id INT,
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
-    FOREIGN KEY (category_id) REFERENCES Recipe_Categories(category_id)
-);
-
-CREATE TABLE Recipe_Tags (
-    tag_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255)
-);
-
-CREATE TABLE Recipe_Tag_Labels (
-    recipe_id INT,
-    tag_id INT,
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
-    FOREIGN KEY (tag_id) REFERENCES Recipe_Tags(tag_id)
-);
-
-CREATE TABLE Recipe_Steps (
-    step_id INT AUTO_INCREMENT PRIMARY KEY,
-    recipe_id INT,
-    description TEXT,
-    order_number INT,
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id)
-);
-
-CREATE TABLE Ingredients (
-    ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
-    ingredient_name VARCHAR(255),
-    category VARCHAR(255),
-    description TEXT,
-    image_url VARCHAR(255)
-);
-
-CREATE TABLE Food_Groups (
-    group_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE FoodGroups (
+    food_group_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
     description TEXT
-);
-
-CREATE TABLE Recipe_Ingredients (
-    recipe_id INT,
-    ingredient_id INT,
-    quantity DECIMAL(10,2),
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
-    FOREIGN KEY (ingredient_id) REFERENCES Ingredients(ingredient_id)
-);
-
-CREATE TABLE Equipment (
-    equipment_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    description TEXT,
-    usage_instructions TEXT
-);
-
-CREATE TABLE Recipe_Equipment (
-    recipe_id INT,
-    equipment_id INT,
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id),
-    FOREIGN KEY (equipment_id) REFERENCES Equipment(equipment_id)
-);
-
-CREATE TABLE Nutritional_Information (
-    info_id INT AUTO_INCREMENT PRIMARY KEY,
-    recipe_id INT,
-    fat_per_serving DECIMAL(10,2),
-    protein_per_serving DECIMAL(10,2),
-    carbs_per_serving DECIMAL(10,2),
-    calories_per_serving DECIMAL(10,2),
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id)
 );
 
 CREATE TABLE Users (
@@ -119,23 +26,23 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE Episodes (
-    episode_id INT AUTO_INCREMENT PRIMARY KEY,
-    number INT,
-    date DATE,
-    cuisine_id INT,
-    winning_recipe_id INT,
-    winning_cook_id INT,
-    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id),
-    FOREIGN KEY (winning_recipe_id) REFERENCES Recipes(recipe_id),
-    FOREIGN KEY (winning_cook_id) REFERENCES Users(user_id)
+    episode_id INT AUTO_INCREMENT PRIMARY KEY
 );
 
-CREATE TABLE Judges (
-    judge_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    expertise VARCHAR(255),
+CREATE TABLE judges (
+    judges_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
     contact_number VARCHAR(20),
-    email VARCHAR(255)
+    date_of_birth DATE,
+    age INT,
+    years_of_experience INT,
+    expertise VARCHAR(255),
+    cuisine_id INT,
+    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id),
+    -- Προσθήκη πεδίου για επαγγελματική κατάρτιση (με κατηγορίες από Γ' μάγειρας έως αρχιμάγειρας)
+    -- Τα επίπεδα κατάρτισης θα αποθηκεύονται ως αριθμοί από 1 έως 5, με 5 να αντιστοιχεί στο υψηλότερο επίπεδο
+    training_level INT CHECK (training_level >= 1 AND training_level <= 5)
 );
 
 CREATE TABLE Ratings (
@@ -161,6 +68,18 @@ CREATE TABLE MealTypes (
     name VARCHAR(255),
     description TEXT
 );
+
+INSERT INTO MealTypes (meal_type_id, name, description) VALUES
+(1, 'Breakfast', 'The first meal of the day, typically eaten in the morning.'),
+(2, 'Brunch', 'A meal eaten late in the morning, combining breakfast and lunch.'),
+(3, 'Lunch', 'A meal eaten in the middle of the day.'),
+(4, 'Snack', 'A small portion of food eaten between meals.'),
+(5, 'Dinner', 'The main meal of the day, eaten in the evening.'),
+(6, 'Supper', 'A light meal eaten late in the evening.'),
+(7, 'Dessert', 'A sweet course typically eaten at the end of a meal.'),
+(8, 'Appetizer', 'A small dish served before a main meal.'),
+(9, 'Tea', 'A light afternoon meal typically including tea.'),
+(10, 'Midnight Snack', 'A small meal eaten late at night.');
 
 CREATE TABLE RecipeMealTypes (
     recipe_id INT,
@@ -227,21 +146,11 @@ CREATE TABLE RecipeIngredients (
 
 CREATE TABLE NutritionalInfo (
     recipe_id INT PRIMARY KEY,
+    recipe_name VARCHAR(255),
     fat_per_serving DECIMAL(10,2),
     protein_per_serving DECIMAL(10,2),
     carbohydrates_per_serving DECIMAL(10,2),
     calories_per_serving INT,
-    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id)
-);
-
-CREATE TABLE RecipeSteps (
-    step_id INT PRIMARY KEY,
-    recipe_id INT,
-    step_order INT,
-    description TEXT,
-    servings INT,
-    preparation_time INT,
-    cooking_time INT,
     FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id)
 );
 
@@ -259,14 +168,6 @@ CREATE TABLE RecipeThemeRelations (
     FOREIGN KEY (theme_id) REFERENCES RecipeThemes(theme_id)
 );
 
-
-CREATE TABLE ChefCuisine (
-    chef_id INT,
-    cuisine VARCHAR(255),
-    PRIMARY KEY (chef_id, cuisine),
-    FOREIGN KEY (chef_id) REFERENCES Chefs(chef_id)
-);
-
 CREATE TABLE chefs (
     chef_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255),
@@ -282,20 +183,6 @@ CREATE TABLE chefs (
     -- Τα επίπεδα κατάρτισης θα αποθηκεύονται ως αριθμοί από 1 έως 5, με 5 να αντιστοιχεί στο υψηλότερο επίπεδο
     training_level INT CHECK (training_level >= 1 AND training_level <= 5)
 );
-
-CREATE TABLE low_training_episode (
-    episode INT PRIMARY KEY,
-    training_level INT
-);
-
-CREATE TABLE top_rated_judges (
-        judge_id INT AUTO_INCREMENT PRIMARY KEY,
-        judge_first_name VARCHAR(255),
-        judge_last_name VARCHAR(255),
-        chef_first_name VARCHAR(255),
-        chef_last_name VARCHAR(255),
-        total_rating FLOAT
-    )
 
 ALTER TABLE RecipeMealTypes
 DROP FOREIGN KEY recipemealtypes_ibfk_2,  -- Drop the existing foreign key constraint
