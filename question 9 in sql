@@ -6,20 +6,6 @@ CREATE TABLE average_carbon (
 ALTER TABLE average_carbon
 ADD PRIMARY KEY (year_id);
 
-**mexri edo
-
-ALTER TABLE selected_recipes
-ADD COLUMN year INT;
-
-ALTER TABLE selected_recipes
-ADD COLUMN year INT;
-
-ALTER TABLE nutritionalinfo
-ADD COLUMN recipe_name VARCHAR(255);
-
-ALTER TABLE nutritionalinfo
-ADD COLUMN recipe_name VARCHAR(255);
-
 
 UPDATE nutritionalinfo ni
 JOIN (
