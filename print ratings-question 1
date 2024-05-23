@@ -1,3 +1,0 @@
-SELECT chef_id, national_cuisine, AVG(rating) AS average_rating
-FROM Ratings
-GROUP BY chef_id, national_cuisine;
