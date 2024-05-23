@@ -1,20 +1,3 @@
-CREATE TABLE chefs (
-    chef_id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(255),
-    last_name VARCHAR(255),
-    contact_number VARCHAR(20),
-    date_of_birth DATE,
-    age INT,
-    years_of_experience INT,
-    expertise VARCHAR(255),
-    cuisine_id INT,
-    FOREIGN KEY (cuisine_id) REFERENCES Cuisines(cuisine_id),
-    -- Προσθήκη πεδίου για επαγγελματική κατάρτιση (με κατηγορίες από Γ' μάγειρας έως αρχιμάγειρας)
-    -- Τα επίπεδα κατάρτισης θα αποθηκεύονται ως αριθμοί από 1 έως 5, με 5 να αντιστοιχεί στο υψηλότερο επίπεδο
-    training_level INT CHECK (training_level >= 1 AND training_level <= 5)
-);
-
-
 INSERT INTO Chefs (user_id, national_cuisine, experience_years, specialization, training_level) VALUES
     (2, 'Italian', 5, 'Italian Cuisine', 'Sous Chef'),
     (3, 'French', 8, 'French Cuisine', 'Line Cook'),
@@ -69,21 +52,6 @@ INSERT INTO chefs (chef_id, age, expertise, cuisine_id, name) VALUES
 (20, 42, 1, 20, 'African');
 
 
-CREATE TABLE low_training_episode (
-    episode INT PRIMARY KEY,
-    training_level INT
-);
-
-CREATE TABLE top_rated_judges (
-        judge_id INT AUTO_INCREMENT PRIMARY KEY,
-        judge_first_name VARCHAR(255),
-        judge_last_name VARCHAR(255),
-        chef_first_name VARCHAR(255),
-        chef_last_name VARCHAR(255),
-        total_rating FLOAT
-    )
-
-
 INSERT INTO meal_types (name)
 VALUES 
     ('breakfast'),
@@ -92,11 +60,6 @@ VALUES
     ('dinner'),
     ('snack'),
     ('dessert');
-
-ALTER TABLE RecipeMealTypes
-DROP FOREIGN KEY recipemealtypes_ibfk_2,  -- Drop the existing foreign key constraint
-ADD CONSTRAINT fk_meal_type_id  -- Add a new foreign key constraint
-FOREIGN KEY (meal_type_id) REFERENCES MealTypes(meal_type_id);
 
 INSERT INTO RecipeMealTypes (recipe_id, meal_type_id)
 VALUES 
