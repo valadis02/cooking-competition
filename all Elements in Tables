@@ -408,3 +408,14 @@ VALUES
 ('Ruby', 'Evans', '5678906780', '1981-10-25', 42, 20, 5, 5, 4),
 ('Steve', 'Edwards', '6789016780', '1993-06-13', 31, 9, 6, 6, 5),
 ('Tara', 'Collins', '7890126780', '1975-08-07', 48, 25, 7, 7, 2);
+
+INSERT INTO episodes (episode_id) VALUES (1);
+INSERT INTO episodes (episode_id) VALUES (2);
+INSERT INTO episodes (episode_id) VALUES (3);
+INSERT INTO episodes (episode_id) VALUES (4);
+INSERT INTO episodes (episode_id) VALUES (5);
+INSERT INTO episodes (episode_id) VALUES (6);
+INSERT INTO episodes (episode_id) VALUES (7);
+INSERT INTO episodes (episode_id) VALUES (8);
+INSERT INTO episodes (episode_id) VALUES (9);
+INSERT INTO episodes (episode_id) VALUES (10);
