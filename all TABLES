@@ -282,3 +282,17 @@ CREATE TABLE chefs (
     -- Τα επίπεδα κατάρτισης θα αποθηκεύονται ως αριθμοί από 1 έως 5, με 5 να αντιστοιχεί στο υψηλότερο επίπεδο
     training_level INT CHECK (training_level >= 1 AND training_level <= 5)
 );
+
+CREATE TABLE low_training_episode (
+    episode INT PRIMARY KEY,
+    training_level INT
+);
+
+CREATE TABLE top_rated_judges (
+        judge_id INT AUTO_INCREMENT PRIMARY KEY,
+        judge_first_name VARCHAR(255),
+        judge_last_name VARCHAR(255),
+        chef_first_name VARCHAR(255),
+        chef_last_name VARCHAR(255),
+        total_rating FLOAT
+    )
