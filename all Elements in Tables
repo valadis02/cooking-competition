@@ -24,7 +24,7 @@ INSERT INTO Cuisines (cuisine_id,name, description) VALUES
 (19, 'Swedish', 'Simple, fresh cuisine'),
 (20, 'African', 'Diverse, bold flavors');
 
-INSERT INTO Recipes (recipe_id, name, description, cuisine, difficulty)
+INSERT INTO Recipes (recipe_id, recipe_name, description, cuisine, difficulty)
 VALUES 
     (1, 'Thai Chicken', 'A delicious Thai-inspired chicken dish.', 8, 3),
     (2, 'Turkey Soup', 'A comforting soup made with turkey and vegetables.', 14, 2),
