@@ -296,3 +296,8 @@ CREATE TABLE top_rated_judges (
         chef_last_name VARCHAR(255),
         total_rating FLOAT
     )
+
+ALTER TABLE RecipeMealTypes
+DROP FOREIGN KEY recipemealtypes_ibfk_2,  -- Drop the existing foreign key constraint
+ADD CONSTRAINT fk_meal_type_id  -- Add a new foreign key constraint
+FOREIGN KEY (meal_type_id) REFERENCES MealTypes(meal_type_id);
