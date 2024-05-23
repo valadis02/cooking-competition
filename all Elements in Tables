@@ -1,1 +1,168 @@
+INSERT INTO Chefs (user_id, national_cuisine, experience_years, specialization, training_level) VALUES
+    (2, 'Italian', 5, 'Italian Cuisine', 'Sous Chef'),
+    (3, 'French', 8, 'French Cuisine', 'Line Cook'),
+    (4, 'Japanese', 6, 'Japanese Cuisine', 'Garde Manger'),
+    (5, 'Mexican', 12, 'Mexican Cuisine', 'Chef'),
+    (1, 'Greek', 10, 'Greek Cuisine', 'Chef');
 
+INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES
+    (2, 'Italian', 1, 4.5),
+    (2, 'Italian', 2, 4.0),
+    (3, 'French', 3, 3.8);
+    
+-- Insert 15 more cuisines into the Cuisines table with shorter descriptions
+INSERT INTO Cuisines (cuisine_id,name, description) VALUES
+(6, 'Indian', 'Spicy, flavorful dishes'),
+(7, 'Tinisian', 'Mediterranean delights'),
+(8, 'Thai', 'Sweet, sour, spicy'),
+(9, 'Spanish', 'Rich, bold flavors'),
+(10, 'Mediterranean', 'Fresh, light cuisine'),
+(11, 'Korean', 'Savory, spicy dishes'),
+(12, 'Vietnamese', 'Fresh, aromatic cuisine'),
+(13, 'Brazilian', 'Grilled meats, feijoada'),
+(14, 'Turkish', 'Rich, diverse flavors'),
+(15, 'Lebanese', 'Aromatic, bold spices'),
+(16, 'Moroccan', 'Exotic, fragrant dishes'),
+(17, 'Russian', 'Hearty, comforting food'),
+(18, 'Peruvian', 'Fusion of flavors'),
+(19, 'Swedish', 'Simple, fresh cuisine'),
+(20, 'African', 'Diverse, bold flavors');
+
+-- Insert 20 chefs into the chefs table, naming them after the cuisines
+INSERT INTO chefs (chef_id, age, expertise, cuisine_id, name) VALUES
+(1, 30, 2, 1, 'French'),
+(2, 35, 3, 2, 'Italian'),
+(3, 28, 1, 3, 'Greek'),
+(4, 40, 2, 4, 'Japanese'),
+(5, 25, 3, 5, 'Mexican'),
+(6, 32, 2, 6, 'Indian'),
+(7, 37, 1, 7, 'Tinisian'),
+(8, 29, 3, 8, 'Thai'),
+(9, 33, 1, 9, 'Spanish'),
+(10, 38, 2, 10, 'Mediterranean'),
+(11, 27, 3, 11, 'Korean'),
+(12, 31, 1, 12, 'Vietnamese'),
+(13, 36, 2, 13, 'Brazilian'),
+(14, 26, 1, 14, 'Turkish'),
+(15, 34, 3, 15, 'Lebanese'),
+(16, 39, 2, 16, 'Moroccan'),
+(17, 24, 1, 17, 'Russian'),
+(18, 41, 3, 18, 'Peruvian'),
+(19, 23, 2, 19, 'Swedish'),
+(20, 42, 1, 20, 'African');
+
+
+INSERT INTO meal_types (name)
+VALUES 
+    ('breakfast'),
+    ('brunch'),
+    ('lunch'),
+    ('dinner'),
+    ('snack'),
+    ('dessert');
+
+INSERT INTO RecipeMealTypes (recipe_id, meal_type_id)
+VALUES 
+    (1, 3),  
+    (2, 4),          
+    (3, 4),          
+    (4, 4),          
+    (5, 3),          
+    (6, 3),          
+    (7, 3),          
+    (8, 4),          
+    (9, 4),          
+    (10, 4);         
+
+-- RecipeLabels for Thai Chicken
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (1, 1);   
+
+-- RecipeLabels for Turkey Soup
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (2, 4),   
+    (2, 9);   
+
+-- RecipeLabels for Ham and Potato Soup
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (3, 4),   
+    (3, 9);   
+
+-- RecipeLabels for Batter Herb Chicken
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (4, 2);   
+
+-- RecipeLabels for Kung Pao Chicken
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (5, 2);
+
+-- RecipeLabels for One Pot Chicken and Potatoes
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (6, 2);   
+
+-- RecipeLabels for Buckwheat Chicken Pilaf
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (7, 2);   
+
+-- RecipeLabels for Bacon and Honey Potato Salad
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (8, 3),  
+    (8, 5);  
+
+-- RecipeLabels for Honey Lime Chicken
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (9, 2);  
+
+-- RecipeLabels for Potato Apple Roast
+INSERT INTO RecipeLabels (recipe_id, label_id)
+VALUES 
+    (10, 2); 
+
+-- Tip for Thai Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (1,1, 'For a milder flavor, reduce the amount of chili peppers used in this recipe.');
+
+-- Tip for Turkey Soup
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (2,2, 'Garnish each serving of soup with a sprig of fresh parsley for added flavor and presentation.');
+
+-- Tip for Ham and Potato Soup
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (3,3, 'To make this soup even heartier, consider adding diced carrots and celery.');
+
+-- Tip for Batter Herb Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (4,4, 'Marinate the chicken in the herb mixture for at least 1 hour before cooking for maximum flavor.');
+
+-- Tip for Kung Pao Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (5,5, 'Adjust the amount of chili flakes according to your spice preference.');
+
+-- Tip for One Pot Chicken and Potatoes
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (6,6, 'Feel free to add your favorite vegetables to this one-pot dish, such as bell peppers or green beans.');
+
+-- Tip for Buckwheat Chicken Pilaf
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (7,7, 'Toasting the buckwheat before cooking adds a nutty flavor to the pilaf.');
+
+-- Tip for Bacon and Honey Potato Salad
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (8,8, 'For a smokier flavor, use applewood-smoked bacon in this salad.');
+
+-- Tip for Honey Lime Chicken
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (9,9, 'Serve this dish with steamed rice and a side of sautéed vegetables for a complete meal.');
+
+-- Tip for Potato Apple Roast
+INSERT INTO Tips (tip_id,recipe_id, tip)
+VALUES (10,10, 'Try using a mix of sweet and tart apples for a more complex flavor profile in this dish.');
