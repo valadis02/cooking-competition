@@ -1,8 +1,11 @@
-INSERT INTO Ratings (chef_id, national_cuisine, user_id, rating) VALUES
-    (2, 'Italian', 1, 4.5),
-    (2, 'Italian', 2, 4.0),
-    (3, 'French', 3, 3.8);
-    
+-- Inserting into the Cuisines table
+INSERT INTO Cuisines (name, description) VALUES
+    ('French', 'Traditional French cuisine'),
+    ('Italian', 'Classic Italian dishes'),
+    ('Greek', 'Authentic Greek recipes'),
+    ('Japanese', 'Japanese culinary delights'),
+    ('Mexican', 'Spicy Mexican dishes');
+
 -- Insert 15 more cuisines into the Cuisines table with shorter descriptions
 INSERT INTO Cuisines (cuisine_id,name, description) VALUES
 (6, 'Indian', 'Spicy, flavorful dishes'),
@@ -21,51 +24,83 @@ INSERT INTO Cuisines (cuisine_id,name, description) VALUES
 (19, 'Swedish', 'Simple, fresh cuisine'),
 (20, 'African', 'Diverse, bold flavors');
 
--- Insert 20 chefs into the chefs table, naming them after the cuisines
-INSERT INTO chefs (chef_id, age, expertise, cuisine_id, name) VALUES
-(1, 30, 2, 1, 'French'),
-(2, 35, 3, 2, 'Italian'),
-(3, 28, 1, 3, 'Greek'),
-(4, 40, 2, 4, 'Japanese'),
-(5, 25, 3, 5, 'Mexican'),
-(6, 32, 2, 6, 'Indian'),
-(7, 37, 1, 7, 'Tinisian'),
-(8, 29, 3, 8, 'Thai'),
-(9, 33, 1, 9, 'Spanish'),
-(10, 38, 2, 10, 'Mediterranean'),
-(11, 27, 3, 11, 'Korean'),
-(12, 31, 1, 12, 'Vietnamese'),
-(13, 36, 2, 13, 'Brazilian'),
-(14, 26, 1, 14, 'Turkish'),
-(15, 34, 3, 15, 'Lebanese'),
-(16, 39, 2, 16, 'Moroccan'),
-(17, 24, 1, 17, 'Russian'),
-(18, 41, 3, 18, 'Peruvian'),
-(19, 23, 2, 19, 'Swedish'),
-(20, 42, 1, 20, 'African');
-
-
-INSERT INTO meal_types (name)
+INSERT INTO Recipes (recipe_id, name, description, cuisine, difficulty)
 VALUES 
-    ('breakfast'),
-    ('brunch'),
-    ('lunch'),
-    ('dinner'),
-    ('snack'),
-    ('dessert');
+    (1, 'Thai Chicken', 'A delicious Thai-inspired chicken dish.', 8, 3),
+    (2, 'Turkey Soup', 'A comforting soup made with turkey and vegetables.', 14, 2),
+    (3, 'Ham and Potato Soup', 'A hearty soup with ham, potatoes, and vegetables.', 1, 2),
+    (4, 'Batter Herb Chicken', 'Crispy herb-coated chicken cooked to perfection.', 2, 4),
+    (5, 'Kung Pao Chicken', 'A spicy and savory Chinese chicken dish with peanuts and vegetables.', 6, 3),
+    (6, 'One Pot Chicken and Potatoes', 'An easy and flavorful one-pot meal with chicken and potatoes.', 4, 2),
+    (7, 'Buckwheat Chicken Pilaf', 'A nutritious and tasty pilaf made with buckwheat and chicken.', 3, 3),
+    (8, 'Bacon and Honey Potato Salad', 'A delicious potato salad with crispy bacon and honey dressing.', 11, 2),
+    (9, 'Honey Lime Chicken', 'Juicy grilled chicken marinated in honey and lime.', 13, 3),
+    (10, 'Potato Apple Roast', 'A comforting and flavorful roast with potatoes and apples.', 20, 2);
 
-INSERT INTO RecipeMealTypes (recipe_id, meal_type_id)
+INSERT INTO Users (username, password_hash, role, full_name, email, date_of_birth, age, contact_number, professional_experience_years, specialization, training_level) VALUES
+    ('admin', 'adminpasswordhash', 'Administrator', 'Admin User', 'admin@example.com', '1990-01-01', 34, '1234567890', 10, 'General Cooking', 'Chef'),
+    ('cook1', 'cookpasswordhash1', 'Cook', 'Cook One', 'cook1@example.com', '1995-05-15', 29, '9876543210', 5, 'Italian Cuisine', 'Sous Chef'),
+    ('cook2', 'cookpasswordhash2', 'Cook', 'Cook Two', 'cook2@example.com', '1988-09-20', 33, '5678901234', 8, 'French Cuisine', 'Line Cook'),
+    ('cook3', 'cookpasswordhash3', 'Cook', 'Cook Three', 'cook3@example.com', '1992-11-12', 29, '3456789012', 6, 'Japanese Cuisine', 'Garde Manger'),
+    ('cook4', 'cookpasswordhash4', 'Cook', 'Cook Four', 'cook4@example.com', '1985-03-25', 36, '2345678901', 12, 'Mexican Cuisine', 'Chef');
+
+INSERT INTO labels (label_id, name)
 VALUES 
-    (1, 3),  
-    (2, 4),          
-    (3, 4),          
-    (4, 4),          
-    (5, 3),          
-    (6, 3),          
-    (7, 3),          
-    (8, 4),          
-    (9, 4),          
-    (10, 4);         
+    (1, 'soup'),
+    (2, 'salad'),
+    (3, 'sandwich'),
+    (4, 'appetizer'),
+    (5, 'main course'),
+    (6, 'side dish'),
+    (7, 'dessert');
+
+INSERT INTO Equipment (equipment_id, name, instructions)
+VALUES 
+    (1, 'measuring spoon', 'Use for accurate measurement of small quantities of ingredients.'),
+    (2, 'colander', 'Use to drain liquids from foods, such as pasta or vegetables.'),
+    (3, 'peeler', 'Use to remove the skin or outer layer of fruits and vegetables.'),
+    (4, 'tongs', 'Use to grip and lift hot or slippery items.'),
+    (5, 'blender', 'Use to blend or purée ingredients into smooth mixtures.'),
+    (6, 'potato masher', 'Use to mash cooked potatoes or other soft foods.'),
+    (7, 'thermometer', 'Use to measure the temperature of foods or liquids.'),
+    (8, 'stockpot', 'Use to cook large quantities of soups, stocks, or stews.'),
+    (9, 'cutting board', 'Use as a surface for chopping, slicing, and cutting foods.'),
+    (10, 'measuring cup', 'Use for accurate measurement of liquid or dry ingredients.'),
+    (11, 'can opener', 'Use to open cans or tins.'),
+    (12, 'whisk', 'Use to beat or whip ingredients to incorporate air.'),
+    (13, 'grater', 'Use to grate or shred foods into fine pieces.'),
+    (14, 'scale', 'Use to measure the weight of ingredients accurately.'),
+    (15, 'knife', 'Use for cutting, slicing, and chopping ingredients.'),
+    (16, 'bowl', 'Use as a container for mixing, serving, or storing ingredients.'),
+    (17, 'spatula', 'Use to flip, lift, or scrape foods from cooking surfaces.'),
+    (18, 'spoon', 'Use for stirring, mixing, and serving foods.'),
+    (19, 'salad spinner', 'Use to wash and dry salad greens or herbs.'),
+    (20, 'casserole', 'Use for baking and serving casseroles or other oven dishes.');
+
+INSERT INTO Ingredients (ingredient_id, name, description, food_group)
+VALUES 
+    (1, 'chicken', 'Chicken meat is a versatile ingredient used in various cuisines and dishes.', 'Meat/Poultry'),
+    (2, 'noodles', 'Noodles are a type of staple food made from unleavened dough.', 'Grains/Pasta'),
+    (3, 'eggs', 'Eggs are a common ingredient used in cooking and baking.', 'Dairy/Eggs'),
+    (4, 'turkey', 'Turkey meat is a popular choice for holiday meals and sandwiches.', 'Meat/Poultry'),
+    (5, 'potatoes', 'Potatoes are a starchy tuberous crop widely used in cooking.', 'Vegetables'),
+    (6, 'ham', 'Ham is a preserved pork product commonly used as a meat ingredient in dishes.', 'Meat/Poultry'),
+    (7, 'onion', 'Onions are a flavorful vegetable used as a base ingredient in many recipes.', 'Vegetables'),
+    (8, 'milk', 'Milk is a nutrient-rich liquid produced by mammals.', 'Dairy/Eggs'),
+    (9, 'rice', 'Rice is a staple food and primary dietary staple for more than half of the world\'s population.', 'Grains/Pasta'),
+    (10, 'peanut', 'Peanuts are a legume crop grown mainly for its edible seeds.', 'Nuts/Seeds'),
+    (11, 'water chestnuts', 'Water chestnuts are aquatic vegetables grown for their corms.', 'Vegetables'),
+    (12, 'carrots', 'Carrots are a root vegetable rich in vitamins and commonly used in cooking.', 'Vegetables'),
+    (13, 'buckwheat', 'Buckwheat is a gluten-free seed used as a grain-like ingredient in cooking.', 'Grains/Pasta'),
+    (14, 'bacon', 'Bacon is a type of salt-cured pork made from various cuts, typically from the pork belly or back cuts.', 'Meat/Poultry'),
+    (15, 'apple', 'Apples are a popular fruit consumed fresh or used in cooking and baking.', 'Fruits');
+
+INSERT INTO labels (label_id, name)
+VALUES 
+    (8, 'beverage'),
+    (9, 'breakfast'),
+    (10, 'snack');
+
 
 -- RecipeLabels for Thai Chicken
 INSERT INTO RecipeLabels (recipe_id, label_id)
@@ -230,93 +265,6 @@ VALUES
     (10, 8, '200g'),   
     (10, 15, '4');
 
--- Inserting into the Cuisines table
-INSERT INTO Cuisines (name, description) VALUES
-    ('French', 'Traditional French cuisine'),
-    ('Italian', 'Classic Italian dishes'),
-    ('Greek', 'Authentic Greek recipes'),
-    ('Japanese', 'Japanese culinary delights'),
-    ('Mexican', 'Spicy Mexican dishes');
-
-
-INSERT INTO Users (username, password_hash, role, full_name, email, date_of_birth, age, contact_number, professional_experience_years, specialization, training_level) VALUES
-    ('admin', 'adminpasswordhash', 'Administrator', 'Admin User', 'admin@example.com', '1990-01-01', 34, '1234567890', 10, 'General Cooking', 'Chef'),
-    ('cook1', 'cookpasswordhash1', 'Cook', 'Cook One', 'cook1@example.com', '1995-05-15', 29, '9876543210', 5, 'Italian Cuisine', 'Sous Chef'),
-    ('cook2', 'cookpasswordhash2', 'Cook', 'Cook Two', 'cook2@example.com', '1988-09-20', 33, '5678901234', 8, 'French Cuisine', 'Line Cook'),
-    ('cook3', 'cookpasswordhash3', 'Cook', 'Cook Three', 'cook3@example.com', '1992-11-12', 29, '3456789012', 6, 'Japanese Cuisine', 'Garde Manger'),
-    ('cook4', 'cookpasswordhash4', 'Cook', 'Cook Four', 'cook4@example.com', '1985-03-25', 36, '2345678901', 12, 'Mexican Cuisine', 'Chef');
-
-INSERT INTO labels (label_id, name)
-VALUES 
-    (1, 'soup'),
-    (2, 'salad'),
-    (3, 'sandwich'),
-    (4, 'appetizer'),
-    (5, 'main course'),
-    (6, 'side dish'),
-    (7, 'dessert');
-
-INSERT INTO Equipment (equipment_id, name, instructions)
-VALUES 
-    (1, 'measuring spoon', 'Use for accurate measurement of small quantities of ingredients.'),
-    (2, 'colander', 'Use to drain liquids from foods, such as pasta or vegetables.'),
-    (3, 'peeler', 'Use to remove the skin or outer layer of fruits and vegetables.'),
-    (4, 'tongs', 'Use to grip and lift hot or slippery items.'),
-    (5, 'blender', 'Use to blend or purée ingredients into smooth mixtures.'),
-    (6, 'potato masher', 'Use to mash cooked potatoes or other soft foods.'),
-    (7, 'thermometer', 'Use to measure the temperature of foods or liquids.'),
-    (8, 'stockpot', 'Use to cook large quantities of soups, stocks, or stews.'),
-    (9, 'cutting board', 'Use as a surface for chopping, slicing, and cutting foods.'),
-    (10, 'measuring cup', 'Use for accurate measurement of liquid or dry ingredients.'),
-    (11, 'can opener', 'Use to open cans or tins.'),
-    (12, 'whisk', 'Use to beat or whip ingredients to incorporate air.'),
-    (13, 'grater', 'Use to grate or shred foods into fine pieces.'),
-    (14, 'scale', 'Use to measure the weight of ingredients accurately.'),
-    (15, 'knife', 'Use for cutting, slicing, and chopping ingredients.'),
-    (16, 'bowl', 'Use as a container for mixing, serving, or storing ingredients.'),
-    (17, 'spatula', 'Use to flip, lift, or scrape foods from cooking surfaces.'),
-    (18, 'spoon', 'Use for stirring, mixing, and serving foods.'),
-    (19, 'salad spinner', 'Use to wash and dry salad greens or herbs.'),
-    (20, 'casserole', 'Use for baking and serving casseroles or other oven dishes.');
-
-INSERT INTO Ingredients (ingredient_id, name, description, food_group)
-VALUES 
-    (1, 'chicken', 'Chicken meat is a versatile ingredient used in various cuisines and dishes.', 'Meat/Poultry'),
-    (2, 'noodles', 'Noodles are a type of staple food made from unleavened dough.', 'Grains/Pasta'),
-    (3, 'eggs', 'Eggs are a common ingredient used in cooking and baking.', 'Dairy/Eggs'),
-    (4, 'turkey', 'Turkey meat is a popular choice for holiday meals and sandwiches.', 'Meat/Poultry'),
-    (5, 'potatoes', 'Potatoes are a starchy tuberous crop widely used in cooking.', 'Vegetables'),
-    (6, 'ham', 'Ham is a preserved pork product commonly used as a meat ingredient in dishes.', 'Meat/Poultry'),
-    (7, 'onion', 'Onions are a flavorful vegetable used as a base ingredient in many recipes.', 'Vegetables'),
-    (8, 'milk', 'Milk is a nutrient-rich liquid produced by mammals.', 'Dairy/Eggs'),
-    (9, 'rice', 'Rice is a staple food and primary dietary staple for more than half of the world\'s population.', 'Grains/Pasta'),
-    (10, 'peanut', 'Peanuts are a legume crop grown mainly for its edible seeds.', 'Nuts/Seeds'),
-    (11, 'water chestnuts', 'Water chestnuts are aquatic vegetables grown for their corms.', 'Vegetables'),
-    (12, 'carrots', 'Carrots are a root vegetable rich in vitamins and commonly used in cooking.', 'Vegetables'),
-    (13, 'buckwheat', 'Buckwheat is a gluten-free seed used as a grain-like ingredient in cooking.', 'Grains/Pasta'),
-    (14, 'bacon', 'Bacon is a type of salt-cured pork made from various cuts, typically from the pork belly or back cuts.', 'Meat/Poultry'),
-    (15, 'apple', 'Apples are a popular fruit consumed fresh or used in cooking and baking.', 'Fruits');
-
-INSERT INTO Recipes (recipe_id, name, description, cuisine, difficulty)
-VALUES 
-    (1, 'Thai Chicken', 'A delicious Thai-inspired chicken dish.', 8, 3),
-    (2, 'Turkey Soup', 'A comforting soup made with turkey and vegetables.', 14, 2),
-    (3, 'Ham and Potato Soup', 'A hearty soup with ham, potatoes, and vegetables.', 1, 2),
-    (4, 'Batter Herb Chicken', 'Crispy herb-coated chicken cooked to perfection.', 2, 4),
-    (5, 'Kung Pao Chicken', 'A spicy and savory Chinese chicken dish with peanuts and vegetables.', 6, 3),
-    (6, 'One Pot Chicken and Potatoes', 'An easy and flavorful one-pot meal with chicken and potatoes.', 4, 2),
-    (7, 'Buckwheat Chicken Pilaf', 'A nutritious and tasty pilaf made with buckwheat and chicken.', 3, 3),
-    (8, 'Bacon and Honey Potato Salad', 'A delicious potato salad with crispy bacon and honey dressing.', 11, 2),
-    (9, 'Honey Lime Chicken', 'Juicy grilled chicken marinated in honey and lime.', 13, 3),
-    (10, 'Potato Apple Roast', 'A comforting and flavorful roast with potatoes and apples.', 20, 2);
-
-INSERT INTO meal_types (meal_type_id, name)
-VALUES 
-    (7, '-'),
-    (8, '-'),
-    (9, '-'),
-    (10, '-');
-
 -- Equipment for Thai Chicken
 INSERT INTO RecipeEquipment (recipe_id, equipment_id)
 VALUES 
@@ -396,3 +344,16 @@ VALUES
     (10, 9),  -- Cutting Board
     (10, 15), -- Knife
     (10, 20); -- Casserole
+
+INSERT INTO RecipeMealTypes (recipe_id, meal_type_id)
+VALUES 
+    (1, 3),  
+    (2, 4),          
+    (3, 4),          
+    (4, 4),          
+    (5, 3),          
+    (6, 3),          
+    (7, 3),          
+    (8, 4),          
+    (9, 4),          
+    (10, 4);  
