@@ -188,3 +188,9 @@ ALTER TABLE RecipeMealTypes
 DROP FOREIGN KEY recipemealtypes_ibfk_2,  -- Drop the existing foreign key constraint
 ADD CONSTRAINT fk_meal_type_id  -- Add a new foreign key constraint
 FOREIGN KEY (meal_type_id) REFERENCES MealTypes(meal_type_id);
+
+CREATE TABLE winners (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    chef_id INT,
+    episode INT
+);
