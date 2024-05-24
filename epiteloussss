@@ -3,78 +3,130 @@ DELIMITER //
 CREATE TRIGGER UpdateNutritionalInfoTrigger AFTER INSERT ON RecipeIngredients
 FOR EACH ROW
 BEGIN
-    DECLARE recipe_id_var INT;
     DECLARE ingredient_id_var INT;
     DECLARE quantity_var VARCHAR(50);
-    DECLARE fat_per_100g DECIMAL(10,2);
-    DECLARE protein_per_100g DECIMAL(10,2);
-    DECLARE carbohydrates_per_100g DECIMAL(10,2);
-    DECLARE calories_per_100g INT;
-    
-    DECLARE total_fat DECIMAL(10,2);
-    DECLARE total_protein DECIMAL(10,2);
-    DECLARE total_carbohydrates DECIMAL(10,2);
-    DECLARE total_calories INT;
--- Cursor to loop through ingredients
+    DECLARE fat_per_serving DECIMAL(10,2);
+    DECLARE protein_per_serving DECIMAL(10,2);
+    DECLARE carbohydrates_per_serving DECIMAL(10,2);
+    DECLARE calories_per_serving INT;
+
+    DECLARE total_fat DECIMAL(10,2) DEFAULT 0;
+    DECLARE total_protein DECIMAL(10,2) DEFAULT 0;
+    DECLARE total_carbohydrates DECIMAL(10,2) DEFAULT 0;
+    DECLARE total_calories INT DEFAULT 0;
+
+    DECLARE done INT DEFAULT 0;
+
+    -- Cursor to loop through ingredients
     DECLARE ingredient_cursor CURSOR FOR
         SELECT ri.ingredient_id, ri.quantity
         FROM RecipeIngredients ri
-        WHERE ri.recipe_id = recipe_id_var;
-    
+        WHERE ri.recipe_id = NEW.recipe_id;
+
     -- Handler for cursor
-    DECLARE CONTINUE HANDLER FOR NOT FOUND
-        SET ingredient_id_var = NULL;
-    
-    -- Get the recipe_id for the current row
-    SET recipe_id_var = NEW.recipe_id;
-    
-    -- Reset totals for each recipe
-    SET total_fat = 0;
-    SET total_protein = 0;
-    SET total_carbohydrates = 0;
-    SET total_calories = 0;
-    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Open cursor
     OPEN ingredient_cursor;
+
     ingredient_loop: LOOP
         FETCH ingredient_cursor INTO ingredient_id_var, quantity_var;
-        IF ingredient_id_var IS NULL THEN
+        IF done THEN
             LEAVE ingredient_loop;
         END IF;
-        
+
         -- Query nutritional info of the ingredient from Ingredients table
         SELECT fat_info, protein_info, carbohydrate_info, calories_per_serving
-        INTO fat_per_100g, protein_per_100g, carbohydrates_per_100g, calories_per_100g
+        INTO fat_per_serving, protein_per_serving, carbohydrates_per_serving, calories_per_serving
         FROM Ingredients
         WHERE ingredient_id = ingredient_id_var;
-        
+
         -- Adjust nutritional info based on quantity
         IF LOCATE('g', quantity_var) > 0 THEN
             -- Quantity is specified per gram (g)
-            SET total_fat = total_fat + (fat_per_100g * CAST(SUBSTRING_INDEX(quantity_var, ' ', 1) AS DECIMAL(10,2)) / 100);
-            SET total_protein = total_protein + (protein_per_100g * CAST(SUBSTRING_INDEX(quantity_var, ' ', 1) AS DECIMAL(10,2)) / 100);
-            SET total_carbohydrates = total_carbohydrates + (carbohydrates_per_100g * CAST(SUBSTRING_INDEX(quantity_var, ' ', 1) AS DECIMAL(10,2)) / 100);
-            SET total_calories = total_calories + (calories_per_100g * CAST(SUBSTRING_INDEX(quantity_var, ' ', 1) AS DECIMAL(10,2)) / 100);
+            SET total_fat = total_fat + (fat_per_serving * CAST(SUBSTRING_INDEX(quantity_var, 'g', 1) AS DECIMAL(10,2)) / 100);
+            SET total_protein = total_protein + (protein_per_serving * CAST(SUBSTRING_INDEX(quantity_var, 'g', 1) AS DECIMAL(10,2)) / 100);
+            SET total_carbohydrates = total_carbohydrates + (carbohydrates_per_serving * CAST(SUBSTRING_INDEX(quantity_var, 'g', 1) AS DECIMAL(10,2)) / 100);
+            SET total_calories = total_calories + (calories_per_serving * CAST(SUBSTRING_INDEX(quantity_var, 'g', 1) AS DECIMAL(10,2)) / 100);
         ELSE
             -- Quantity is specified per serving
-            SET total_fat = total_fat + (fat_per_100g * CAST(quantity_var AS DECIMAL(10,2)));
-            SET total_protein = total_protein + (protein_per_100g * CAST(quantity_var AS DECIMAL(10,2)));
-            SET total_carbohydrates = total_carbohydrates + (carbohydrates_per_100g * CAST(quantity_var AS DECIMAL(10,2)));
-            SET total_calories = total_calories + (calories_per_100g * CAST(quantity_var AS DECIMAL(10,2)));
+            SET total_fat = total_fat + (fat_per_serving * CAST(quantity_var AS DECIMAL(10,2)));
+            SET total_protein = total_protein + (protein_per_serving * CAST(quantity_var AS DECIMAL(10,2)));
+            SET total_carbohydrates = total_carbohydrates + (carbohydrates_per_serving * CAST(quantity_var AS DECIMAL(10,2)));
+            SET total_calories = total_calories + (calories_per_serving * CAST(quantity_var AS DECIMAL(10,2)));
         END IF;
     END LOOP;
+
     CLOSE ingredient_cursor;
-    
+
     -- Insert or update calculated nutritional info into NutritionalInfo table
-    INSERT INTO NutritionalInfo (recipe_id, fat_per_serving, protein_per_serving, carbohydrates_per_serving, calories_per_serving)
-    VALUES (recipe_id_var, total_fat, total_protein, total_carbohydrates, total_calories)
+    INSERT INTO NutritionalInfo (recipe_id, recipe_name, fat_per_serving, protein_per_serving, carbohydrates_per_serving, calories_per_serving)
+    VALUES (NEW.recipe_id, (SELECT recipe_name FROM Recipes WHERE recipe_id = NEW.recipe_id), total_fat, total_protein, total_carbohydrates, total_calories)
     ON DUPLICATE KEY UPDATE
-    fat_per_serving = total_fat,
-    protein_per_serving = total_protein,
-    carbohydrates_per_serving = total_carbohydrates,
-    calories_per_serving = total_calories;
+        fat_per_serving = total_fat,
+        protein_per_serving = total_protein,
+        carbohydrates_per_serving = total_carbohydrates,
+        calories_per_serving = total_calories;
 END //
 
 DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER UpdateCaloriesAfterInsert ON RecipeIngredients
+FOR EACH ROW
+BEGIN
+    DECLARE ingredient_id_var INT;
+    DECLARE quantity_var VARCHAR(50);
+    DECLARE calories_info INT;
+    DECLARE total_calories INT DEFAULT 0;
+
+    DECLARE done INT DEFAULT 0;
+
+    -- Cursor to loop through ingredients
+    DECLARE ingredient_cursor CURSOR FOR
+        SELECT ri.ingredient_id, ri.quantity
+        FROM RecipeIngredients ri
+        WHERE ri.recipe_id = NEW.recipe_id;
+
+    -- Handler for cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Open cursor
+    OPEN ingredient_cursor;
+
+    ingredient_loop: LOOP
+        FETCH ingredient_cursor INTO ingredient_id_var, quantity_var;
+        IF done THEN
+            LEAVE ingredient_loop;
+        END IF;
+
+        -- Query nutritional info of the ingredient from Ingredients table
+        SELECT calories_per_serving
+        INTO calories_info
+        FROM Ingredients
+        WHERE ingredient_id = ingredient_id_var;
+
+        -- Adjust calories based on quantity
+        IF LOCATE('g', quantity_var) > 0 THEN
+            -- Quantity is specified per gram (g)
+            SET total_calories = total_calories + (calories_info * CAST(SUBSTRING_INDEX(quantity_var, 'g', 1) AS DECIMAL(10,2)) / 100);
+        ELSE
+            -- Quantity is specified per serving
+            SET total_calories = total_calories + (calories_info * CAST(quantity_var AS DECIMAL(10,2)));
+        END IF;
+    END LOOP;
+
+    CLOSE ingredient_cursor;
+
+    -- Update only the calories_per_serving in the NutritionalInfo table
+    UPDATE NutritionalInfo
+    SET calories_per_serving = total_calories
+    WHERE recipe_id = NEW.recipe_id;
+END //
+
+DELIMITER ;
+
 
 INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
 VALUES 
