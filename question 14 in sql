@@ -51,7 +51,7 @@ BEGIN
     INSERT INTO FrequentRecipeThemes (theme_id, name, description, frequency)
     SELECT rt.theme_id, rt.name, rt.description, COUNT(*) AS frequency
     FROM Selected_Recipes sr
-    JOIN Recipes r ON sr.recipe_name = r.name
+    JOIN Recipes r ON sr.recipe_name = r.recipe_name
     JOIN RecipeThemeRelations rtr ON r.recipe_id = rtr.recipe_id
     JOIN RecipeThemes rt ON rtr.theme_id = rt.theme_id
     GROUP BY rt.theme_id, rt.name, rt.description
