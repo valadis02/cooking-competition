@@ -9,23 +9,44 @@ db = mysql.connector.connect(
     database="db2"
 )
 
-# Create a cursor to execute SQL queries
+# Create a cursor to execute SQL queries1
 cursor = db.cursor()
 
-# Define classes
+# Function to authenticate user
+def authenticate_user():
+    username = input("Enter your username: ")
+    password = input("Enter your password: ")
+    
+    cursor.execute("SELECT * FROM Users WHERE username = %s AND password_hash = %s", (username, password))
+    user = cursor.fetchone()
+    
+    if user:
+        return user
+    else:
+        print("Invalid username or password.")
+        return None
 
+# Authenticate user
+user = None
+while user is None:
+    user = authenticate_user()
+
+# Define user role
+user_role = user[3]  # Assuming the role is the fourth column in the Users table
+user_id = user[0]    # Assuming the user_id is the first column in the Users table
+
+# Define classes
 class Chef:
-    def __init__(self, chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth):
+    def __init__(self, chef_id, first_name, last_name, contact_number, age, years_of_experience, expertise, cuisine_id, training_level):
         self.chef_id = chef_id
         self.first_name = first_name
         self.last_name = last_name
+        self.contact_number = contact_number
         self.age = age
         self.years_of_experience = years_of_experience
         self.expertise = expertise
         self.cuisine_id = cuisine_id
         self.training_level = training_level
-        self.contact_number = contact_number
-        self.date_of_birth = date_of_birth
         self.rating = []
 
 class Judge:
@@ -39,24 +60,19 @@ class Cuisine:
 
 def update_appearances_table(selected_chefs):
     for chef in selected_chefs:
-        # Check if chef already exists in the appearances table
         cursor.execute("SELECT total_appearances FROM appearances WHERE chef_id = %s", (chef.chef_id,))
         result = cursor.fetchone()
 
         if result:
-            # Chef already exists, update total appearances
             total_appearances = result[0] + 1
             cursor.execute("UPDATE appearances SET total_appearances = %s WHERE chef_id = %s", (total_appearances, chef.chef_id))
         else:
-            # Chef doesn't exist, insert new record
             cursor.execute("INSERT INTO appearances (chef_id, total_appearances) VALUES (%s, 1)", (chef.chef_id,))
     
-    # Commit changes to the database
     db.commit()
 
 def insert_selected_recipe(episode_id, recipe_name):
     try:
-        # Insert the new recipe with year 2002
         cursor.execute("INSERT INTO selected_recipes (episode, recipe_name, year) VALUES (%s, %s, %s)", (episode_id, recipe_name, 2002))
         print(f"Inserted recipe '{recipe_name}' for episode {episode_id}.")
         db.commit()
@@ -64,7 +80,6 @@ def insert_selected_recipe(episode_id, recipe_name):
         print(f"Error: {err}")
         db.rollback()
 
-# Function to calculate score
 def calculate_score(chef):
     if chef.rating:
         avg_rating = sum(chef.rating) / len(chef.rating)
@@ -81,116 +96,150 @@ def insert_rating(chef_id, national_cuisine, user_id, rating):
     db.commit()
 
 def select_random_recipe():
-    # Select a random recipe_id from 1 to 10
     recipe_id = random.randint(1, 10)
-
-    # Fetch the recipe name based on the selected recipe_id
     cursor.execute("SELECT recipe_name FROM Recipes WHERE recipe_id = %s", (recipe_id,))
     recipe = cursor.fetchone()
 
     if not recipe:
         raise ValueError(f"No recipe found for recipe_id {recipe_id}")
 
-    return recipe[0]  # Return the recipe name
+    return recipe[0]
 
-# Function to update the winners table
 def update_winners_table(winner_id, episode):
     sql = "INSERT INTO winners (chef_id, episode) VALUES (%s, %s)"
     val = (winner_id, episode)
     cursor.execute(sql, val)
     db.commit()
 
-# Function to insert selected chefs into the selected_chefs table
 def insert_selected_chefs(episode_id, selected_chefs):
     for chef in selected_chefs:
-        sql = """INSERT INTO selected_chefs (episode, chef_id, first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level) 
-                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-        val = (episode_id, chef.chef_id, chef.first_name, chef.last_name, chef.contact_number, chef.date_of_birth, chef.age, chef.years_of_experience, chef.expertise, chef.cuisine_id, chef.training_level)
+        sql = """INSERT INTO selected_chefs (episode, chef_id, first_name, last_name, contact_number, age, years_of_experience, expertise, cuisine_id, training_level) 
+                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        val = (episode_id, chef.chef_id, chef.first_name, chef.last_name, chef.contact_number, chef.age, chef.years_of_experience, chef.expertise, chef.cuisine_id, chef.training_level)
         cursor.execute(sql, val)
     db.commit()
 
-# Main code for the competition
-for episode in range(10):
-    print(f"Episode {episode + 1}:")
-
-    # Fetch all chefs from the database
-    cursor.execute("SELECT * FROM chefs")
-    rows = cursor.fetchall()
-
-    # List to store Chef objects
-    chefs = []
-
-    # Create Chef objects from the retrieved data
-    for row in rows:
-        chef_id, first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level = row
-        chef = Chef(chef_id, first_name, last_name, age, years_of_experience, expertise, cuisine_id, training_level, contact_number, date_of_birth)
-        chefs.append(chef)
-
-    # Shuffle the list of chefs for random selection
-    random.shuffle(chefs)
-
-    # Randomly select 10 chefs for this episode
-    selected_chefs = random.sample(chefs, 10)
-
-    # Update the appearances table
-    update_appearances_table(selected_chefs)
-
-    # Insert selected chefs into the selected_chefs table
-    insert_selected_chefs(episode + 1, selected_chefs)
-
-    # Remove selected chefs from the list to ensure judges are selected from the remaining chefs
-    for chef in selected_chefs:
-        chefs.remove(chef)
-
-    # List to store judges for this episode
-    episode_judges = []
-
-    # Randomly select 3 judges from the remaining chefs for this episode
-    episode_judges.extend(random.sample(chefs, min(3, len(chefs))))
-
-    # Insert judges into the judges table for this episode
-    for judge in episode_judges:
-        cursor.execute("INSERT INTO judges (first_name, last_name, contact_number, date_of_birth, age, years_of_experience, expertise, cuisine_id, training_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                       (judge.first_name, judge.last_name, judge.contact_number, judge.date_of_birth, judge.age, judge.years_of_experience, judge.expertise, judge.cuisine_id, judge.training_level))
-        db.commit()
-
-    # Clear ratings for all chefs before each episode
-    for chef in chefs:
-        chef.rating = []
-
-    # Execute recipe for each chef
-    for chef in selected_chefs:
-        # Generate a random recipe
-        try:
-            recipe = select_random_recipe()
-        except ValueError as e:
-            print(f"Error selecting recipe: {e}")
-            continue
-
-        # Debugging print statements
-        print(f"Inserting recipe for Episode {episode + 1}: {recipe}")
+# Function to change chef details
+def change_chef_details():
+    chef_username = input("Enter the username of the chef whose details you want to change: ")
+    cursor.execute("SELECT * FROM Users WHERE username = %s AND role = 'Cook'", (chef_username,))
+    chef = cursor.fetchone()
+    
+    if chef:
+        print("Enter new details for the chef (leave blank to keep current value):")
+        new_full_name = input(f"Full name [{chef[4]}]: ") or chef[4]
+        new_email = input(f"Email [{chef[5]}]: ") or chef[5]
+        new_contact_number = input(f"Contact number [{chef[8]}]: ") or chef[8]
         
-        insert_selected_recipe(episode + 1, recipe)
+        cursor.execute("""
+            UPDATE Users 
+            SET full_name = %s, email = %s, contact_number = %s
+            WHERE username = %s
+        """, (new_full_name, new_email, new_contact_number, chef_username))
+        db.commit()
+        print("Chef details updated successfully.")
+    else:
+        print("Chef not found.")
 
-        # Print the chef's name and the generated recipe
-        print(f"{chef.first_name} executes recipe '{recipe}'")
+# Function to change recipe details
+def change_recipe_details():
+    recipe_name = input("Enter the name of the recipe you want to change: ")
+    cursor.execute("SELECT * FROM Recipes WHERE recipe_name = %s", (recipe_name,))
+    recipe = cursor.fetchone()
+    
+    if recipe:
+        print("Enter new details for the recipe (leave blank to keep current value):")
+        new_description = input(f"Description [{recipe[2]}]: ") or recipe[2]
+        new_cuisine = input(f"Cuisine ID [{recipe[3]}]: ") or recipe[3]
+        new_difficulty = input(f"Difficulty [{recipe[4]}]: ") or recipe[4]
+        
+        cursor.execute("""
+            UPDATE Recipes 
+            SET description = %s, cuisine = %s, difficulty = %s
+            WHERE recipe_name = %s
+        """, (new_description, new_cuisine, new_difficulty, recipe_name))
+        db.commit()
+        print("Recipe details updated successfully.")
+    else:
+        print("Recipe not found.")
 
-        # Judge the recipe
-        ratings = [random.randint(1, 5) for _ in range(len(episode_judges))]  # Generates ratings for each judge
-        print(f"Ratings for {chef.first_name}: {ratings}")
+# Function to run the competition
+def run_competition():
+    for episode in range(10):
+        print(f"Episode {episode + 1}:")
 
-        # Insert ratings into the Ratings table
-        for rating, judge in zip(ratings, episode_judges):
-            insert_rating(chef.chef_id, None, judge.chef_id, rating)  # Set national_cuisine to None for simplicity
-            # Append rating to chef's rating list
-            chef.rating.append(rating)
+        cursor.execute("SELECT chef_id, first_name, last_name, contact_number, age, years_of_experience, expertise, cuisine_id, training_level FROM chefs")
+        rows = cursor.fetchall()
 
-    # Calculate total scores for this episode and find the winner
-    winner = max(selected_chefs, key=calculate_score)
-    print(f"Winner of Episode {episode + 1}: {winner.first_name} {winner.last_name} (Chef {winner.chef_id})\n")
+        chefs = [Chef(*row) for row in rows]
 
-    # Add the winner to the winners table
-    update_winners_table(winner.chef_id, episode + 1)
+        random.shuffle(chefs)
+
+        selected_chefs = random.sample(chefs, 10)
+
+        update_appearances_table(selected_chefs)
+
+        insert_selected_chefs(episode + 1, selected_chefs)
+
+        for chef in selected_chefs:
+            chefs.remove(chef)
+
+        episode_judges = random.sample(chefs, min(3, len(chefs)))
+
+        for judge in episode_judges:
+            cursor.execute("INSERT INTO judges (chef_id, first_name, last_name, contact_number, age, years_of_experience, expertise, cuisine_id, training_level) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                           (judge.chef_id, judge.first_name, judge.last_name, judge.contact_number, judge.age, judge.years_of_experience, judge.expertise, judge.cuisine_id, judge.training_level))
+            db.commit()
+
+        for chef in chefs:
+            chef.rating = []
+
+        for chef in selected_chefs:
+            try:
+                recipe = select_random_recipe()
+            except ValueError as e:
+                print(f"Error selecting recipe: {e}")
+                continue
+
+            print(f"Inserting recipe for Episode {episode + 1}: {recipe}")
+            insert_selected_recipe(episode + 1, recipe)
+            print(f"{chef.first_name} executes recipe '{recipe}'")
+
+            ratings = [random.randint(1, 5) for _ in range(len(episode_judges))]
+            print(f"Ratings for {chef.first_name}: {ratings}")
+
+            for rating, judge in zip(ratings, episode_judges):
+                insert_rating(chef.chef_id, None, judge.chef_id, rating)
+                chef.rating.append(rating)
+
+        winner = max(selected_chefs, key=calculate_score)
+        print(f"Winner of Episode {episode + 1}: {winner.first_name} {winner.last_name} (Chef {winner.chef_id})\n")
+        update_winners_table(winner.chef_id, episode + 1)
+
+# Main code
+if user_role == 'Administrator':
+    while True:
+        print("Select an option:")
+        print("1. Change chef details")
+        print("2. Change recipe details")
+        print("3. Run the competition")
+        print("4. Exit")
+        
+        choice = input("Enter your choice: ")
+        
+        if choice == '1':
+            change_chef_details()
+        elif choice == '2':
+            change_recipe_details()
+        elif choice == '3':
+            run_competition()
+        elif choice == '4':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+else:
+    print(f"Welcome, {user[4]}! You have limited access as a Cook.")
+    run_competition()
 
 # Close cursor and database connection
 cursor.close()
