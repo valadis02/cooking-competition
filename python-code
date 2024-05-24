@@ -6,7 +6,7 @@ db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="12345",
-    database="db"
+    database="db2"
 )
 
 # Create a cursor to execute SQL queries
@@ -54,21 +54,15 @@ def update_appearances_table(selected_chefs):
     # Commit changes to the database
     db.commit()
 
-def insert_or_update_selected_recipe(episode_id, recipe_name):
-    # Check if the recipe already exists for the episode
-    cursor.execute("SELECT COUNT(*) FROM selected_recipes WHERE episode = %s", (episode_id,))
-    count = cursor.fetchone()[0]
-
-    if count < 100:
-        # If count is less than 100, insert the new recipe with year 2000
+def insert_selected_recipe(episode_id, recipe_name):
+    try:
+        # Insert the new recipe with year 2002
         cursor.execute("INSERT INTO selected_recipes (episode, recipe_name, year) VALUES (%s, %s, %s)", (episode_id, recipe_name, 2002))
+        print(f"Inserted recipe '{recipe_name}' for episode {episode_id}.")
         db.commit()
-    else:
-        # Replace the oldest entry with the new recipe name and year 2000
-        cursor.execute("SELECT MIN(id) FROM selected_recipes WHERE episode = %s", (episode_id,))
-        oldest_id = cursor.fetchone()[0]
-        cursor.execute("UPDATE selected_recipes SET recipe_name = %s, year = %s WHERE id = %s", (recipe_name, 2002, oldest_id))
-        db.commit()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        db.rollback()
 
 # Function to calculate score
 def calculate_score(chef):
@@ -87,14 +81,17 @@ def insert_rating(chef_id, national_cuisine, user_id, rating):
     db.commit()
 
 def select_random_recipe():
-    # Fetch all recipes from the database
-    cursor.execute("SELECT name FROM Recipes")
-    recipes = cursor.fetchall()
+    # Select a random recipe_id from 1 to 10
+    recipe_id = random.randint(1, 10)
 
-    # Randomly select one recipe
-    random_recipe = random.choice(recipes)
+    # Fetch the recipe name based on the selected recipe_id
+    cursor.execute("SELECT recipe_name FROM Recipes WHERE recipe_id = %s", (recipe_id,))
+    recipe = cursor.fetchone()
 
-    return random_recipe[0]  # Return the recipe name
+    if not recipe:
+        raise ValueError(f"No recipe found for recipe_id {recipe_id}")
+
+    return recipe[0]  # Return the recipe name
 
 # Function to update the winners table
 def update_winners_table(winner_id, episode):
@@ -164,9 +161,16 @@ for episode in range(10):
     # Execute recipe for each chef
     for chef in selected_chefs:
         # Generate a random recipe
-        recipe = select_random_recipe()
+        try:
+            recipe = select_random_recipe()
+        except ValueError as e:
+            print(f"Error selecting recipe: {e}")
+            continue
 
-        insert_or_update_selected_recipe(episode + 1, recipe)
+        # Debugging print statements
+        print(f"Inserting recipe for Episode {episode + 1}: {recipe}")
+        
+        insert_selected_recipe(episode + 1, recipe)
 
         # Print the chef's name and the generated recipe
         print(f"{chef.first_name} executes recipe '{recipe}'")
