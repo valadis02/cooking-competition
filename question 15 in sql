@@ -83,7 +83,7 @@ BEGIN
     JOIN (
         SELECT fga.food_group_id
         FROM FoodGroupAssociations fga
-        JOIN Recipes r ON fga.recipe_id = r.recipe_id
+        JOIN Recipes r ON fga.recipe_name = r.recipe_name
         WHERE r.recipe_name = NEW.recipe_name
     ) AS temp ON ff.food_group_id = temp.food_group_id
     SET ff.count = ff.count + 1;
