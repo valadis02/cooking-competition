@@ -75,3 +75,50 @@ BEGIN
 END //
 
 DELIMITER ;
+
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, quantity)
+VALUES 
+    -- Thai Chicken
+    (1, 1, '200g'),  -- Chicken
+    (1, 7, '50g'),   -- Onion
+
+    -- Turkey Soup
+    (2, 4, '150g'),  -- Turkey
+    (2, 5, '100g'),  -- Potatoes
+    (2, 7, '50g'),   -- Onion
+    (2, 12, '50g'),  -- Carrots
+
+    -- Ham and Potato Soup
+    (3, 6, '100g'),  -- Ham
+    (3, 5, '200g'),  -- Potatoes
+    (3, 7, '50g'),   -- Onion
+
+    -- Batter Herb Chicken
+    (4, 1, '200g'),  -- Chicken
+    (4, 3, '2'),     -- Eggs
+
+    -- Kung Pao Chicken
+    (5, 1, '200g'),  -- Chicken
+    (5, 10, '50g'),  -- Peanut
+    (5, 11, '50g'),  -- Water chestnuts
+
+    -- One Pot Chicken and Potatoes
+    (6, 1, '200g'),  -- Chicken
+    (6, 5, '200g'),  -- Potatoes
+    (6, 7, '50g'),   -- Onion
+
+    -- Buckwheat Chicken Pilaf
+    (7, 1, '200g'),  -- Chicken
+    (7, 13, '100g'), -- Buckwheat
+    (7, 7, '50g'),   -- Onion
+
+    -- Bacon and Honey Potato Salad
+    (8, 5, '200g'),  -- Potatoes
+    (8, 14, '50g'),  -- Bacon
+
+    -- Honey Lime Chicken
+    (9, 1, '200g'),  -- Chicken
+
+    -- Potato Apple Roast
+    (10, 5, '200g'), -- Potatoes
+    (10, 15, '100g');-- Apple
