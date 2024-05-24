@@ -1,53 +1,38 @@
 CREATE TABLE average_carbon (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     year_id INT,
     average_carbon DECIMAL(10, 2)
 );
 
-ALTER TABLE average_carbon
-ADD PRIMARY KEY (year_id);
+DELIMITER //
 
-**
-UPDATE nutritionalinfo ni
-JOIN (
-    SELECT 1 AS recipe_id, 'Thai Chicken' AS recipe_name UNION ALL
-    SELECT 2, 'Turkey Soup' UNION ALL
-    SELECT 3, 'Ham and Potato Soup' UNION ALL
-    SELECT 4, 'Batter Herb Chicken' UNION ALL
-    SELECT 5, 'Kung Pao Chicken' UNION ALL
-    SELECT 6, 'One Pot Chicken and Potatoes' UNION ALL
-    SELECT 7, 'Buckwheat Chicken Pilaf' UNION ALL
-    SELECT 8, 'Bacon and Honey Potato Salad' UNION ALL
-    SELECT 9, 'Honey Lime Chicken' UNION ALL
-    SELECT 10, 'Potato Apple Roast'
-) r ON ni.recipe_id = r.recipe_id
-SET ni.recipe_name = r.recipe_name;
-**
+CREATE TRIGGER update_average_carbon_trigger 
+AFTER INSERT ON selected_recipes 
+FOR EACH ROW 
+BEGIN
+    DECLARE carbs DECIMAL(10, 2);
+
+    -- Get the carbohydrates_per_serving for the new recipe
+    SELECT ni.carbohydrates_per_serving
+    INTO carbs
+    FROM nutritionalinfo ni
+    WHERE ni.recipe_name = NEW.recipe_name;
+
+    -- Insert the carbohydrates_per_serving into the average_carbon table
+    INSERT INTO average_carbon (year_id, average_carbon)
+    VALUES (NEW.year, carbs);
+END;
+//
+
+DELIMITER ;
+
 
 CREATE TABLE average2_carbon (
     id INT AUTO_INCREMENT PRIMARY KEY,
     average_carbon DECIMAL(10, 2)
 );
 
-DELIMITER //
-CREATE TRIGGER update_average_carbon_trigger 
-AFTER INSERT ON selected_recipes 
-FOR EACH ROW 
-BEGIN
-    DECLARE carbs DECIMAL(10, 2);
-    
-    -- Get the carbohydrates_per_serving for the new recipe
-    SELECT ni.carbohydrates_per_serving
-    INTO carbs
-    FROM nutritionalinfo ni
-    WHERE ni.recipe_name = NEW.recipe_name;
-    
-    -- Insert the carbohydrates_per_serving into the average_carbon table
-    INSERT INTO average_carbon (average_carbon)
-    VALUES (carbs);
-END;
-//
 
-DELIMITER ;
 
 ALTER TABLE average2_carbon ADD COLUMN year_id INT;
 
