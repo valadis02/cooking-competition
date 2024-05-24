@@ -9,18 +9,32 @@ CREATE TABLE chefs_not_judges (
     date_of_birth DATE
 );
 
-DELIMITER //
-CREATE TRIGGER insert_chef_trigger
-AFTER INSERT ON chefs
+DELIMITER $$
+
+CREATE TRIGGER after_judge_insert
+AFTER INSERT ON judges
 FOR EACH ROW
 BEGIN
-    DECLARE chef_id_count INT;
-    SET chef_id_count = (SELECT COUNT(*) FROM winners WHERE chef_id = NEW.chef_id);
-    IF chef_id_count = 0 THEN
+    -- Update the counter
+    UPDATE judge_insert_counter
+    SET count = count + 1
+    WHERE id = 1;
+
+    -- Check if the counter has reached 30
+    IF (SELECT count FROM judge_insert_counter WHERE id = 1) >= 30 THEN
+        -- Insert chefs who are not judges into the chefs_not_judges table
         INSERT INTO chefs_not_judges (chef_id, first_name, last_name, age, expertise, cuisine_id, contact_number, date_of_birth)
-        VALUES (NEW.chef_id, NEW.first_name, NEW.last_name, NEW.age, NEW.expertise, NEW.cuisine_id, NEW.contact_number, NEW.date_of_birth);
+        SELECT c.chef_id, c.first_name, c.last_name, c.age, c.expertise, c.cuisine_id, c.contact_number, c.date_of_birth
+        FROM chefs c
+        LEFT JOIN judges j ON c.chef_id = j.chef_id
+        WHERE j.chef_id IS NULL;
+
+        -- Reset the counter
+        UPDATE judge_insert_counter
+        SET count = 0
+        WHERE id = 1;
     END IF;
-END;
-//
+END $$
 
 DELIMITER ;
+
