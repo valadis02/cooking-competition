@@ -40,19 +40,18 @@ INSERT INTO FoodGroupAssociations (food_group_id, ingredient_id) VALUES
 (2, 14), -- Vegetables and Spinach
 (4, 15); -- Proteins and Almonds
 
--- Trigger to insert food groups into SelectedFoodGroups after inserting a recipe into SelectedRecipes
-DELIMITER //
-
 CREATE TRIGGER insert_food_groups_after_recipe
-AFTER INSERT ON Selected_Recipes
+AFTER INSERT ON selected_recipes
 FOR EACH ROW
 BEGIN
     -- Insert associated food groups into SelectedFoodGroups
     INSERT INTO SelectedFoodGroups (recipe_name, food_group_id)
     SELECT NEW.recipe_name, fga.food_group_id
-    FROM FoodGroupAssociations fga
-    JOIN Recipes r ON fga.recipe_id = r.recipe_id
-    WHERE r.name = NEW.recipe_name;
+    FROM Recipe_Ingredients ri
+    JOIN Ingredients i ON ri.ingredient_id = i.ingredient_id
+    JOIN FoodGroupAssociations fga ON i.ingredient_id = fga.ingredient_id
+    JOIN Recipes r ON ri.recipe_id = r.recipe_id
+    WHERE r.recipe_name = NEW.recipe_name;
 END//
 
 DELIMITER ;
@@ -76,7 +75,7 @@ ON DUPLICATE KEY UPDATE count = count;
 DELIMITER //
 
 CREATE TRIGGER update_found_food_groups
-AFTER INSERT ON SelectedRecipes
+AFTER INSERT ON Selected_Recipes
 FOR EACH ROW
 BEGIN
     -- Update the count of the food groups in FoundFoodGroups
@@ -85,7 +84,7 @@ BEGIN
         SELECT fga.food_group_id
         FROM FoodGroupAssociations fga
         JOIN Recipes r ON fga.recipe_id = r.recipe_id
-        WHERE r.name = NEW.recipe_name
+        WHERE r.recipe_name = NEW.recipe_name
     ) AS temp ON ff.food_group_id = temp.food_group_id
     SET ff.count = ff.count + 1;
 END//
