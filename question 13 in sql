@@ -53,10 +53,9 @@ BEGIN
             INSERT INTO low_train_episode (episode, training_sum)
             VALUES (NEW.episode, IFNULL(chef_sum, 0));
         ELSE
-            -- Update the existing entry by adding the new sum
-            UPDATE low_train_episode
-            SET training_sum = training_sum + IFNULL(chef_sum, 0)
-            WHERE episode = NEW.episode;
+            -- Insert a new row with the episode and new sum
+            INSERT INTO low_train_episode (episode, training_sum)
+            VALUES (NEW.episode, IFNULL(chef_sum, 0));
         END IF;
     END IF;
 END$$
@@ -64,13 +63,12 @@ END$$
 DELIMITER ;
 
 
--- Create the low_train_episode2 table
+
 CREATE TABLE low_train_episode2 (
     id INT AUTO_INCREMENT PRIMARY KEY,
     training_sum INT
 );
 
--- Create the low_train_episode3 table
 CREATE TABLE low_train_episode3 (
     id INT AUTO_INCREMENT PRIMARY KEY,
     training_sum INT
