@@ -1,3 +1,4 @@
+-- Modified selected_chefs table
 CREATE TABLE selected_chefs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     episode INT,
@@ -10,9 +11,15 @@ CREATE TABLE selected_chefs (
     years_of_experience INT,
     expertise VARCHAR(255),
     cuisine_id INT,
-    training_level VARCHAR(255)
+    training_level INT -- Changed to INT for numeric operations
 );
 
+-- Low_train_episode table definition
+CREATE TABLE low_train_episode (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    episode INT,
+    training_sum INT
+);
 
 DELIMITER $$
 
@@ -21,7 +28,6 @@ AFTER INSERT ON selected_chefs
 FOR EACH ROW
 BEGIN
     DECLARE chef_count INT;
-    DECLARE training_sum INT;
     DECLARE chef_sum INT;
 
     -- Count the number of chefs for the current episode
@@ -57,12 +63,6 @@ END$$
 
 DELIMITER ;
 
--- Create the low_train_episode table
-CREATE TABLE low_train_episode (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    episode INT,
-    training_sum INT
-);
 
 -- Create the low_train_episode2 table
 CREATE TABLE low_train_episode2 (
