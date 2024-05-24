@@ -71,19 +71,21 @@ SELECT fg.food_group_id, fg.name, fg.description, 0
 FROM FoodGroups fg
 ON DUPLICATE KEY UPDATE count = count;
 
--- Create the trigger to update FoundFoodGroups after inserting a recipe into SelectedRecipes
+-- Create the trigger to update FoundFoodGroups after inserting a recipe into selected_recipes
 DELIMITER //
 
 CREATE TRIGGER update_found_food_groups
-AFTER INSERT ON Selected_Recipes
+AFTER INSERT ON selected_recipes
 FOR EACH ROW
 BEGIN
     -- Update the count of the food groups in FoundFoodGroups
     UPDATE FoundFoodGroups ff
     JOIN (
         SELECT fga.food_group_id
-        FROM FoodGroupAssociations fga
-        JOIN Recipes r ON fga.recipe_name = r.recipe_name
+        FROM Recipe_Ingredients ri
+        JOIN Recipes r ON ri.recipe_id = r.recipe_id
+        JOIN Ingredients i ON ri.ingredient_id = i.ingredient_id
+        JOIN FoodGroupAssociations fga ON i.ingredient_id = fga.ingredient_id
         WHERE r.recipe_name = NEW.recipe_name
     ) AS temp ON ff.food_group_id = temp.food_group_id
     SET ff.count = ff.count + 1;
