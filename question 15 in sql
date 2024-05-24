@@ -5,6 +5,41 @@ CREATE TABLE SelectedFoodGroups (
     FOREIGN KEY (food_group_id) REFERENCES FoodGroups(food_group_id)
 );
 
+-- Create the FoodGroupAssociations table
+CREATE TABLE FoodGroupAssociations (
+    association_id INT AUTO_INCREMENT PRIMARY KEY,
+    food_group_id INT,
+    ingredient_id INT,
+    FOREIGN KEY (food_group_id) REFERENCES FoodGroups(food_group_id),
+    FOREIGN KEY (ingredient_id) REFERENCES Ingredients(ingredient_id)
+);
+
+-- Insert sample data into FoodGroups
+INSERT INTO FoodGroups (name, description) VALUES 
+('Fruits', 'All types of fruits'),
+('Vegetables', 'All types of vegetables'),
+('Grains', 'Cereals and grains'),
+('Proteins', 'Meat, fish, and legumes'),
+('Dairy', 'Milk and dairy products');
+
+-- Insert sample data into FoodGroupAssociations
+INSERT INTO FoodGroupAssociations (food_group_id, ingredient_id) VALUES 
+(1, 1), -- Fruits and Apple
+(1, 2), -- Fruits and Banana
+(2, 3), -- Vegetables and Carrot
+(2, 4), -- Vegetables and Broccoli
+(3, 7), -- Grains and Rice
+(3, 8), -- Grains and Wheat
+(4, 5), -- Proteins and Chicken
+(4, 6), -- Proteins and Salmon
+(4, 11), -- Proteins and Lentils
+(4, 12), -- Proteins and Eggs
+(4, 13), -- Proteins and Beef
+(5, 9), -- Dairy and Milk
+(5, 10), -- Dairy and Cheese
+(2, 14), -- Vegetables and Spinach
+(4, 15); -- Proteins and Almonds
+
 -- Trigger to insert food groups into SelectedFoodGroups after inserting a recipe into SelectedRecipes
 DELIMITER //
 
