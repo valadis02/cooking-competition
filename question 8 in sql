@@ -1,3 +1,5 @@
+CREATE INDEX idx_count ON found_equipment(count);
+
 -- Step 1: Create the found_equipment table
 CREATE TABLE found_equipment (
     equipment_id INT PRIMARY KEY,
@@ -52,11 +54,11 @@ BEGIN
     DECLARE max_instructions TEXT;
 
     -- Βρείτε το μέγιστο count από τον πίνακα found_equipment
-    SELECT MAX(count) INTO max_count FROM found_equipment;
+    SELECT MAX(count) INTO max_count FROM found_equipment FORCE INDEX (idx_count);
 
     -- Βρείτε το εξοπλισμό με το μέγιστο count
     SELECT equipment_id, name, instructions INTO max_equipment_id, max_name, max_instructions
-    FROM found_equipment
+    FROM found_equipment FORCE INDEX (idx_count)
     WHERE count = max_count
     LIMIT 1;
 
@@ -70,4 +72,14 @@ END//
 
 DELIMITER ;
 
+EXPLAIN SELECT MAX(count) FROM found_equipment;
+EXPLAIN SELECT equipment_id, name, instructions
+FROM found_equipment
+WHERE count = (SELECT MAX(count) FROM found_equipment)
+LIMIT 1;
+EXPLAIN SELECT MAX(count) FROM found_equipment FORCE INDEX (idx_count);
+EXPLAIN SELECT equipment_id, name, instructions
+FROM found_equipment FORCE INDEX (idx_count)
+WHERE count = (SELECT MAX(count) FROM found_equipment FORCE INDEX (idx_count))
+LIMIT 1;
 
