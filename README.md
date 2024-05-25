@@ -84,6 +84,7 @@
 ## Συγγραφείς
 - Tsirindanis Chrysovaladis
 - Email: balt5249@gmail.com
+- AM: 03120184
 
 ## Πηγές
 - [Εθνικές Κουζίνες](https://el.wikipedia.org/wiki/Κατηγορία:Εθνικές_κουζίνες)
